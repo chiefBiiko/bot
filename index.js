@@ -28,23 +28,19 @@ module.exports = function(bp) {
     wordTokenizer: new natural.WordTokenizer()  // std english word tokenizer
   }
 
-  function lowerCase(e, next) {  // incoming order: 1
+  function lowerCaseAndTokenize(e, next) {  // incoming order: 1
     e.text = e.text.toLowerCase()
-    next()
-  }
-
-  function tokenize(e, next) {  // incoming order: 2
     e.tokens = PP.wordTokenizer.tokenize(e.text)
     console.log(`tokens: ${e.tokens}`)
     next()
   }
 
-  function brandmarkQuery(e, next) {  // incoming order: 3
+  function brandmarkQuery(e, next) {  // incoming order: 2
     bp.db.kvs.get('products').then(products => {  // products: fake db
       // db subsets
       const pnames = Object.keys(products)
       const cnames = [ ...new Set(pnames.map(pn => products[pn].category)) ]
-      // detect product query
+      // detecting product query
       e.exactProduct = pnames.filter(pn => e.text.includes(pn))
       e.approxProduct = e.exactProduct.length ? [] :
         pnames.filter(pn => {
@@ -52,7 +48,7 @@ module.exports = function(bp) {
             return natural.LevenshteinDistance(t, pn) <= PP.LEVEN
           })
         })
-      // detect category query
+      // detecting category query
       e.exactCategory = cnames.filter(cn => e.text.includes(cn))
       e.approxCategory = e.exactCategory.length ? [] :
         cnames.filter(cn => {
@@ -60,11 +56,16 @@ module.exports = function(bp) {
             return natural.LevenshteinDistance(t, cn) <= PP.LEVEN
           })
         })
-      // detect attribute query
+      // detecting attribute query
       e.requestsFeature = /feature/.test(e.text)
       e.requestsPicture = /pic|picture|photo/.test(e.text)
       e.requestsPrice = /cost|price/.test(e.text)
       e.requestsRating = /rating|review/.test(e.text)
+      // detecting mapping query
+      e.requestsMin = /min|minimum|cheapest|costs the least/.test(e.text)
+      e.requestsMax = /max|maximum|most expensive|costs the most/.test(e.text)
+      e.requestsAvg = /avg|average|mean/.test(e.text)
+      e.requestsDif = /difference|compare|comparison/.test(e.text)
 
       console.log(`exactProduct: ${e.exactProduct}\n` +
                   `approxProduct: ${e.approxProduct}\n` +
@@ -73,7 +74,11 @@ module.exports = function(bp) {
                   `requestsFeatures: ${e.requestsFeature}\n` +
                   `requestsPictures: ${e.requestsPicture}\n` +
                   `requestsPrice: ${e.requestsPrice}\n` +
-                  `requestsRating: ${e.requestsRating}`)
+                  `requestsRating: ${e.requestsRating}\n` +
+                  `requestsMin: ${e.requestsMin}\n` +
+                  `requestsMax: ${e.requestsMax}\n` +
+                  `requestsAvg: ${e.requestsAvg}\n` +
+                  `requestsDif: ${e.requestsDif}`)
 
       next()
     }).catch(console.error)
@@ -81,25 +86,17 @@ module.exports = function(bp) {
 
   // registering my custom middlewares here!!! multiple???
   bp.middlewares.register({
-    name: 'lowerCase',  // friendly name
+    name: 'lowerCaseAndTokenize',  // friendly name
     type: 'incoming',  // either incoming or outgoing
     order: 1,  // arbitrary number
-    handler: lowerCase,  // the middleware function
-    module: undefined,  // the name of the module, if any
-    description: '...'
-  })
-  bp.middlewares.register({
-    name: 'tokenize',  // friendly name
-    type: 'incoming',  // either incoming or outgoing
-    order: 2,  // arbitrary number
-    handler: tokenize,  // the middleware function  // require here!!!
+    handler: lowerCaseAndTokenize,  // the middleware function
     module: undefined,  // the name of the module, if any
     description: '...'
   })
   bp.middlewares.register({
     name: 'brandmarkQuery',  // friendly name
     type: 'incoming',  // either incoming or outgoing
-    order: 3,  // arbitrary number
+    order: 2,  // arbitrary number
     handler: brandmarkQuery,  // the middleware function
     module: undefined,  // the name of the module, if any
     description: '...'
@@ -108,8 +105,8 @@ module.exports = function(bp) {
   // reload middlewares
   bp.middlewares.load()
 
-// assemble e.flags to actions
-//bp.hear({}, (e, next) => {})
+// assemble e.flags to actions with conditions object!!!
+//bp.hear({...}, (e, next) => {})
 
   // get rid of this hello world stuff eventually...
   // Listens for a first message (this is a Regex)
