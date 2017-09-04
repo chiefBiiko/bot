@@ -16,3 +16,27 @@ goodbye:
   - text: You are leaving because of reason {{reason}}
     typing: true
   - Hope to see you back again soon! # if no other properties, you can just send a strings
+
+
+
+exact-product-feature:
+  - text:
+      - Here is a list of features for the {{product}}...{{features}}
+      - The main features of {{product}} are {{features}}
+    typing: 1s
+
+exact-product-picture:
+  - text:
+      - Here are some pictures for the {{product}}...[pictures]
+      - It looks better in your hands but here are some pics...[pictures]
+    typing: 1s
+
+exact-product-only:
+  - text:
+      - Here is a product card for the {{product}}...[card]
+      - Have a look at this product brief for the {{product}}...[card]
+    typing: 1s
+
+approx-product-only:  # send y/n choice along n send 2 #exact-product-only if y
+  - text: Guessing a little...looking for the {{product}}?  # catch user input!
+    typing: 2s
