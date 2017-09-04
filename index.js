@@ -19,70 +19,86 @@
   Our Slack Community: https://slack.botpress.io
 */
 
+'use strict'
+
 const natural = require('natural')
 
 module.exports = function(bp) {
 
-  const PP = {  // preprocessing stuff bundled
+  const STASH = {  // preprocessing stuff bundled
+    DB_UPD_REF: 0,
     LEVEN: 3,  // Levenshtein distance approximation cutoff
     wordTokenizer: new natural.WordTokenizer()  // std english word tokenizer
   }
 
-  function lowerCaseAndTokenize(e, next) {  // incoming order: 1
+  var DB  // in-memory copy of external database; updated repeatedly
+  bp.db.kvs.get('products').then(db => DB = db).catch(console.error)
+  STASH.DB_UPD_REF = setInterval(() => {
+    console.log('updating DB...')
+    bp.db.kvs.get('products').then(db => DB = db).catch(console.error)
+  }, 1000 * 60 * 1)
+
+  // export this one
+  function lowerCaseAndTokenize(e, next) {  // incoming, order: 1
     e.text = e.text.toLowerCase()
-    e.tokens = PP.wordTokenizer.tokenize(e.text)
-    console.log(`tokens: ${e.tokens}`)
+    e.tokens = STASH.wordTokenizer.tokenize(e.text)
+    console.log(DB)
     next()
   }
 
-  function brandmarkQuery(e, next) {  // incoming order: 2
-    bp.db.kvs.get('products').then(products => {  // products: fake db
-      // db subsets
-      const pnames = Object.keys(products)
-      const cnames = [ ...new Set(pnames.map(pn => products[pn].category)) ]
-      // detecting product query
-      e.exactProduct = pnames.filter(pn => e.text.includes(pn))
-      e.approxProduct = e.exactProduct.length ? [] :
-        pnames.filter(pn => {
-          return e.tokens.some(t => {
-            return natural.LevenshteinDistance(t, pn) <= PP.LEVEN
-          })
+  function flag(e, next) {  // incoming, order: 2, CAUTION: closure!
+    // db subsets
+    const pnames = Object.keys(DB)
+    const cnames = [ ...new Set(pnames.map(pname => DB[pname].category)) ]
+    // detecting product query
+    e.exactProduct = pnames.filter(pname => e.text.includes(pname))
+    e.approxProduct = e.exactProduct.length ? [] :
+      pnames.filter(pname => {
+        return e.tokens.some(token => {
+          return natural.LevenshteinDistance(token, pname) <= STASH.LEVEN
         })
-      // detecting category query
-      e.exactCategory = cnames.filter(cn => e.text.includes(cn))
-      e.approxCategory = e.exactCategory.length ? [] :
-        cnames.filter(cn => {
-          return e.tokens.some(t => {
-            return natural.LevenshteinDistance(t, cn) <= PP.LEVEN
-          })
+      })
+    // detecting category query
+    e.exactCategory = cnames.filter(cname => e.text.includes(cname))
+    e.approxCategory = e.exactCategory.length ? [] :
+      cnames.filter(cname => {
+        return e.tokens.some(token => {
+          return natural.LevenshteinDistance(token, cname) <= STASH.LEVEN
         })
-      // detecting attribute query
-      e.requestsFeature = /feature/.test(e.text)
-      e.requestsPicture = /pic|picture|photo/.test(e.text)
-      e.requestsPrice = /cost|price/.test(e.text)
-      e.requestsRating = /rating|review/.test(e.text)
-      // detecting mapping query
-      e.requestsMin = /min|minimum|cheapest|costs the least/.test(e.text)
-      e.requestsMax = /max|maximum|most expensive|costs the most/.test(e.text)
-      e.requestsAvg = /avg|average|mean/.test(e.text)
-      e.requestsDif = /difference|compare|comparison/.test(e.text)
-
-      console.log(`exactProduct: ${e.exactProduct}\n` +
-                  `approxProduct: ${e.approxProduct}\n` +
-                  `exactCategory: ${e.exactCategory}\n` +
-                  `approxCategory: ${e.approxCategory}\n` +
-                  `requestsFeatures: ${e.requestsFeature}\n` +
-                  `requestsPictures: ${e.requestsPicture}\n` +
-                  `requestsPrice: ${e.requestsPrice}\n` +
-                  `requestsRating: ${e.requestsRating}\n` +
-                  `requestsMin: ${e.requestsMin}\n` +
-                  `requestsMax: ${e.requestsMax}\n` +
-                  `requestsAvg: ${e.requestsAvg}\n` +
-                  `requestsDif: ${e.requestsDif}`)
-
-      next()
-    }).catch(console.error)
+      })
+    // detecting attribute query
+    e.requestsFeature = /feature/.test(e.text)
+    e.requestsPicture = /pic|picture|photo/.test(e.text)
+    e.requestsPrice = /cost|price/.test(e.text)
+    e.requestsRating = /rating|review/.test(e.text)
+    // detecting mapping query
+    e.requestsMin = /min|minimum|cheapest|costs the least/.test(e.text)
+    e.requestsMax = /max|maximum|most expensive|costs the most/.test(e.text)
+    e.requestsAvg = /avg|average|mean/.test(e.text)
+    e.requestsDif = /difference|compare|comparison/.test(e.text)
+    next()
   }
+
+  function devlog(e, next) {
+    console.log(`text: ${e.text}\n` +
+                `tokens: ${JSON.stringify(e.tokens)}\n` +
+                `exactProduct: ${JSON.stringify(e.exactProduct)}\n` +
+                `approxProduct: ${JSON.stringify(e.approxProduct)}\n` +
+                `exactCategory: ${JSON.stringify(e.exactCategory)}\n` +
+                `approxCategory: ${JSON.stringify(e.approxCategory)}\n` +
+                `requestsFeatures: ${e.requestsFeature}\n` +
+                `requestsPictures: ${e.requestsPicture}\n` +
+                `requestsPrice: ${e.requestsPrice}\n` +
+                `requestsRating: ${e.requestsRating}\n` +
+                `requestsMin: ${e.requestsMin}\n` +
+                `requestsMax: ${e.requestsMax}\n` +
+                `requestsAvg: ${e.requestsAvg}\n` +
+                `requestsDif: ${e.requestsDif}`)
+    next()
+  }
+
+  // assemble e.flags to actions with conditions object!!! UMM and stuff
+  //bp.hear({...}, (e, next) => {})
 
   // registering my custom middlewares here!!! multiple???
   bp.middlewares.register({
@@ -94,19 +110,24 @@ module.exports = function(bp) {
     description: '...'
   })
   bp.middlewares.register({
-    name: 'brandmarkQuery',  // friendly name
+    name: 'flag',  // friendly name
     type: 'incoming',  // either incoming or outgoing
     order: 2,  // arbitrary number
-    handler: brandmarkQuery,  // the middleware function
+    handler: flag,  // the middleware function
+    module: undefined,  // the name of the module, if any
+    description: '...'
+  })
+  bp.middlewares.register({
+    name: 'devlog',  // friendly name
+    type: 'incoming',  // either incoming or outgoing
+    order: 3,  // arbitrary number
+    handler: devlog,  // the middleware function
     module: undefined,  // the name of the module, if any
     description: '...'
   })
 
   // reload middlewares
   bp.middlewares.load()
-
-// assemble e.flags to actions with conditions object!!!
-//bp.hear({...}, (e, next) => {})
 
   // get rid of this hello world stuff eventually...
   // Listens for a first message (this is a Regex)
