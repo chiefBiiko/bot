@@ -4,15 +4,20 @@
   "description": "chatbot made with botpress",
   "main": "index.js",
   "dependencies": {
-    "botpress": "1.x",
-    "botpress-web": "1.x",
+    "botpress": "^1.0.28",
+    "botpress-web": "^1.2.3",
     "compromise": "^10.7.2",
     "natural": "^0.5.4"
   },
   "scripts": {
     "start": "botpress start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/mocha"
   },
   "author": "noah anabiik schwarz",
-  "license": "Botpress Proprietary License"
+  "license": "Botpress Proprietary License",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^3.5.0"
+  }
 }

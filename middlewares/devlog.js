@@ -6,13 +6,14 @@ module.exports = (e, next) => {
               `e.approxProduct: ${JSON.stringify(e.approxProduct)}\n` +
               `e.exactCategory: ${JSON.stringify(e.exactCategory)}\n` +
               `e.approxCategory: ${JSON.stringify(e.approxCategory)}\n` +
-              `e.stash.wantsFeature: ${e.stash.wantsFeature}\n` +
-              `e.stash.wantsPicture: ${e.stash.wantsPicture}\n` +
-              `e.stash.wantsPrice: ${e.stash.wantsPrice}\n` +
+              `e.productsByCategory: ${JSON.stringify(e.productsByCategory)}\n` +
+              `e.stash.features: ${JSON.stringify(e.stash.features)}\n` +
+              `e.stash.pictures: ${JSON.stringify(e.stash.pictures)}\n` +
+              `e.stash.price: ${e.stash.price}\n` +
               `e.stash.wantsRating: ${e.stash.wantsRating}\n` +
-              `e.stash.wantsMin: ${e.stash.wantsMin}\n` +
-              `e.stash.wantsMax: ${e.stash.wantsMax}\n` +
-              `e.stash.wantsAvg: ${e.stash.wantsAvg}\n` +
-              `e.stash.wantsDif: ${e.stash.wantsDif}`)
+              `e.flags.wantsMin: ${e.flags.wantsMin}\n` +
+              `e.flags.wantsMax: ${e.flags.wantsMax}\n` +
+              `e.flags.wantsAvg: ${e.flags.wantsAvg}\n` +
+              `e.flags.wantsDif: ${e.flags.wantsDif}`)
   next()
 }
