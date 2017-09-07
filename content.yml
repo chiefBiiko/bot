@@ -13,7 +13,7 @@ welcome-again:
 exact-product-feature:
   - text:
       - Here is a list of features for the {{product}}...{{features}}
-      - The main features of {{product}} are {{features}}
+      - The main features of the {{product}} are {{features}}
     typing: 1s
 
 exact-product-picture:
