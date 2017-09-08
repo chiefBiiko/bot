@@ -5,10 +5,11 @@ const andFmtArr = require('./../helpers/andFmtArr')
 const toTitleCase = require('./../helpers/toTitleCase')
 const checkForUserName = require('./../helpers/checkForUserName')
 const replaceOrNull = require('./../helpers/replaceOrNull')
-const matchExactAndApprox = require('./../helpers/matchExactAndApprox')
-const makeSessionMap = require('./../helpers/makeSessionMap')
+const matchExAx = require('./../helpers/matchExAx')
+const makeActiveMap = require('./../helpers/makeActiveMap')
 
 const lowerCaseAndTokenize = require('./../middlewares/lowerCaseAndTokenize')
+const makeManageSessions = require('./../middlewares/makeManageSessions')
 
 describe('helpers', () => {
   describe('andFmtArr', () => {
@@ -46,30 +47,22 @@ describe('helpers', () => {
       should.equal(replaceOrNull('abc', 'y', 'z'), null)
     })
   })
-  describe('matchExactAndApprox', () => {
-    it('should return a 2D array', () => {
-      const x = matchExactAndApprox('buy me an ipad pro',
-                                    ['buy', 'me', 'an', 'ipad', 'pro'],
-                                    ['iphone 7', 'ipad pro'])
-      x.should.be.an('array')
-      x.forEach(y => y.should.be.an('array'))
+  describe('matchExAx', () => {
+    const x = matchExAx('buy me an ipad pro',
+                        ['buy', 'me', 'an', 'ipad', 'pro'],
+                        ['iphone 7', 'ipad pro'])
+    it('should return an object with .exact and .approx', () => {
+      x.should.be.an('object')
+      x.should.have.all.keys('exact', 'approx')
     })
-    it('should return an array of length 2', () => {
-      const x = matchExactAndApprox('buy me an ipad pro',
-                                    ['buy', 'me', 'an', 'ipad', 'pro'],
-                                    ['iphone 7', 'ipad pro'])
-      x.should.have.lengthOf(2)
-    })
-    it('should return an array that has at least one empty array', () => {
-      const x = matchExactAndApprox('buy me an ipad pro',
-                                    ['buy', 'me', 'an', 'ipad', 'pro'],
-                                    ['iphone 7', 'ipad pro'])
-      x.some(y => y.length === 0).should.be.true
+    it('should return an object that has arrays as values', () => {
+      x.exact.should.be.an('array')
+      x.approx.should.be.an('array')
     })
   })
-  describe('makeSessionMap', () => {
+  describe('makeActiveMap', () => {
     it('should return an ~auto-flush map', done => {
-      const afmap = makeSessionMap(1)
+      const afmap = makeActiveMap(1)
       afmap.set('testsession', {
         convo: { stop: () => {} }, // stop() must be implemented
         last_stamp: 1504786753609 // .last_stamp must be a timestamp
@@ -79,5 +72,44 @@ describe('helpers', () => {
         done()
       }, 1000 * 61)       // exec timeout
     }).timeout(1000 * 62) // test timeout
+  })
+})
+
+describe('middlewares', () => {
+  describe('lowerCaseAndTokenize', () => {
+    const e = lowerCaseAndTokenize({ text: 'Hi Ho' }, () => {})
+    it('should return an object', () => {
+      e.should.be.an('object')
+    })
+    it('should return an object with a lowercased text property value', () => {
+      RegExp('[A-Z]').test(e.text).should.be.false
+    })
+    it('should return an object with an array for .tokens', () => {
+      e.tokens.should.be.an('array')
+    })
+  })
+  describe('makeManageSessions', () => {
+    const bp = { // dependency
+      convo: {
+        start: (a, b) => {
+          return { say: () => {}, repeat: () => {} }
+        }
+      }
+    }
+    const activeMap = makeActiveMap(1) // dependency
+    const manageSessions = makeManageSessions(bp, activeMap)
+    it('should return a function', () => {
+      manageSessions.should.be.a('function')
+    })
+    it('should return a function that manages activeMap\'s members', () => {
+      manageSessions({ text: 'Hi Ho', user: { id: 'xyz' } }, () => {})
+      const session = activeMap.get('xyz')
+      session.should.be.an('object')
+      session.should.have.all.keys('convo', 'first_name', 'last_query',
+                                   'last_stamp')
+    })
+  })
+  describe('makeCheckAgainstDB', () => {
+    //...
   })
 })

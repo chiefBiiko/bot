@@ -1,7 +1,7 @@
 'use strict'
 
 //const andFmtArr = require('./helpers/andFmtArr')
-const SESSIONS = require('./helpers/makeSessionMap')(10)
+const SESSIONS = require('./helpers/makeActiveMap')(10)
 
 module.exports = bp => {
 
@@ -10,54 +10,64 @@ module.exports = bp => {
   // all the hear handlers: always send over existing convo!!!
   // move to outgoing!!!
 
-  // exact product and feature
+  // make one hear handler that checks there is an exact product and then if else to supply the correct rreply!!!!
+  // exact product and attribute except rating
   bp.hear({
-    exactProduct: arr => arr.length !== 0,
-    stash: obj => obj.wantsFeature
+    stash: obj => obj.exactProduct.length !== 0 // GOOD
   }, (e, next) => {
-    e.reply('#exact-product-feature', {
-      product: e.exactProduct[0]
-    //,features: andFmtArr(DB[e.exactProduct[0]].features)//DB[e.exactProduct[0]].features.join(', ')
-    })
+    // e.reply('#exact-product-feature', { // TODO
+    //   product: 'noop'//e.exactProduct[0]
+    // //,features: andFmtArr(DB[e.exactProduct[0]].features)//DB[e.exactProduct[0]].features.join(', ')
+    // })
+
+    // cases !!!!!!!
+    // -if any of e.flags.wantsFeatures, e.flags.wantsPictures, e.flags.wantsPrice
+    // -exact product and rating --- only consider mapping requests with ratings
+    // -exact product only
+
+
+
   //next()
   })
 
-  // exact product and picture
-  bp.hear({
-    exactProduct: arr => arr.length !== 0,
-    stash: obj => obj.wantsPicture
-  }, (e, next) => {
-    e.reply('#exact-product-picture', {
-      product: e.exactProduct[0]
-    //,pictures: andFmtArr(DB[e.exactProduct[0]].pictures)//DB[e.exactProduct[0]].pictures.join(', ')
-    })
-  //next()
-  })
 
-  // exact product and price
-  //...
 
-  // exact product and rating
-  //...
-
-  // exact product only
-  bp.hear({ exactProduct: arr => arr.length !== 0 }, function(e, next) {
-    e.reply('#exact-product-only', { product: e.exactProduct[0] })
-  //next()
-  })
-
-  // approx product only
-  // send y/n button along n send 2 #exact-product-only if y
-  bp.hear({ approxProduct: arr => arr.length !== 0 }, function(e, next) {
-    e.reply('#approx-product-only', { product: e.approxProduct[0] })
-  //next()
-  })
-
-  // exact category only
-  //...
-
-  // approx category only
-  //...
+  // // exact product and picture
+  // bp.hear({
+  //   exactProduct: arr => arr.length !== 0,
+  //   stash: obj => obj.wantsPicture
+  // }, (e, next) => {
+  //   e.reply('#exact-product-picture', {
+  //     product: e.exactProduct[0]
+  //   //,pictures: andFmtArr(DB[e.exactProduct[0]].pictures)//DB[e.exactProduct[0]].pictures.join(', ')
+  //   })
+  // //next()
+  // })
+  //
+  // // exact product and price
+  // //...
+  //
+  // // exact product and rating
+  // //...
+  //
+  // // exact product only
+  // bp.hear({ exactProduct: arr => arr.length !== 0 }, function(e, next) {
+  //   e.reply('#exact-product-only', { product: e.exactProduct[0] })
+  // //next()
+  // })
+  //
+  // // approx product only
+  // // send y/n button along n send 2 #exact-product-only if y
+  // bp.hear({ approxProduct: arr => arr.length !== 0 }, function(e, next) {
+  //   e.reply('#approx-product-only', { product: e.approxProduct[0] })
+  // //next()
+  // })
+  //
+  // // exact category only
+  // //...
+  //
+  // // approx category only
+  // //...
 
   // registering middlewares
   bp.middlewares.register({
@@ -85,9 +95,17 @@ module.exports = bp => {
     description: '...'
   })
   bp.middlewares.register({
-    name: 'devlog',
+    name: 'flag',
     type: 'incoming',
     order: 4,
+    handler: require('./middlewares/flag'),
+    module: undefined,
+    description: '...'
+  })
+  bp.middlewares.register({
+    name: 'devlog',
+    type: 'incoming',
+    order: 5,
     handler: require('./middlewares/devlog'),
     module: undefined,
     description: '...'

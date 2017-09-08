@@ -13,7 +13,7 @@ module.exports = (bp, SESSIONS) => {
         last_query: e.text,
         last_stamp: new Date().getTime()
       })
-    } else {
+    } else { // existing session
       const session = SESSIONS.get(e.user.id)
       if (first_name.length !== 0 ) {
         session.first_name = first_name
@@ -29,6 +29,7 @@ module.exports = (bp, SESSIONS) => {
       SESSIONS.set(e.user.id, session)
     }
     next()
+    return e // 4 dev tests only, ignored by botpress
   }
   // return a closure
   return manageSessions

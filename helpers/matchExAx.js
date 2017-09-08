@@ -1,3 +1,5 @@
+'use strict'
+
 const { LevenshteinDistance } = require('natural')
 
 module.exports = (text, tokens, targetarray, cutoff) => { // Levenshtein cutoff
@@ -8,5 +10,5 @@ module.exports = (text, tokens, targetarray, cutoff) => { // Levenshtein cutoff
       return tokens.some(token => LevenshteinDistance(token, tname) <= cutoff)
     }))
   }
-  return [ exact, approx ]
+  return { exact: exact, approx: approx }
 }
