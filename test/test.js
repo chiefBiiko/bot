@@ -1,3 +1,5 @@
+'use strict'
+
 const chai = require('chai')
 const should = chai.should()
 
@@ -10,6 +12,8 @@ const makeActiveMap = require('./../helpers/makeActiveMap')
 
 const lowerCaseAndTokenize = require('./../middlewares/lowerCaseAndTokenize')
 const makeManageSessions = require('./../middlewares/makeManageSessions')
+const flag = require('./../middlewares/flag')
+const assemble = require('./../middlewares/assemble')
 
 describe('helpers', () => {
   describe('andFmtArr', () => {
@@ -75,16 +79,16 @@ describe('helpers', () => {
   })
 })
 
-describe('middlewares', () => {
+describe('incoming middlewares', () => {
   describe('lowerCaseAndTokenize', () => {
     const e = lowerCaseAndTokenize({ text: 'Hi Ho' }, () => {})
-    it('should return an object', () => {
+    it('should return an object (e)', () => {
       e.should.be.an('object')
     })
-    it('should return an object with a lowercased text property value', () => {
+    it('should return e with a lowercased text property value', () => {
       RegExp('[A-Z]').test(e.text).should.be.false
     })
-    it('should return an object with an array for .tokens', () => {
+    it('should return e with an array for .tokens', () => {
       e.tokens.should.be.an('array')
     })
   })
@@ -111,5 +115,37 @@ describe('middlewares', () => {
   })
   describe('makeCheckAgainstDB', () => {
     //...
+  })
+  describe('flag', () => {
+    const e = flag({ text: 'give me the average rating for the ipad pro' },
+                   () => {})
+    it('should set a bunch of boolean flags as e.flags.wants*', () => {
+      e.flags.should.have.all.keys('wantsFeatures', 'wantsPictures',
+                                   'wantsPrice', 'wantsRating',
+                                   'wantsMin', 'wantsMax', 'wantsAvg')
+      Object.keys(e.flags).filter(flag => flag.startsWith('wants'))
+        .forEach(wantsFlag => e.flags[wantsFlag].should.be.a('boolean'))
+    })
+  })
+  describe('assemble', () => {
+    const e = assemble({ stash: { exactProduct: ['iphone 7', 'ipad pro'] },
+                         flags: {
+                            wantsFeatures: true,
+                            wantsPictures: false,
+                            wantsPrice: true,
+                            wantsRating: false,
+                            wantsMin: false,
+                            wantsMax: false,
+                            wantsAvg: false
+                         }
+                       },
+                       () => {})
+    it('should add a new object under .patch on e', () => {
+      e.should.have.keys('patch')
+    })
+    it('should add an array of text chunks for each exact product hit', () => {
+      e.patch['iphone 7'].should.be.an('array')
+      e.patch['ipad pro'].should.be.an('array')
+    })
   })
 })

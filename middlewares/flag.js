@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = (e, next) => {
   e.flags = {}
   // check if attributes wanted

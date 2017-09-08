@@ -1,3 +1,5 @@
+'use strict'
+
 const checkForUserName = require('./../helpers/checkForUserName')
 
 module.exports = (bp, SESSIONS) => {

@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = minutes => { // ~delete inactive users after minutes
   const SESSIONS = new Map()
   setInterval(() => {

@@ -20,8 +20,8 @@ module.exports = (bp, minutes) => {
       return DB[pname].category
     })) ]
     // product/category hits
-    const productmatches = matchExAx(e.text, e.tokens, productnames, 3);
-    const categorymatches = matchExAx(e.text, e.tokens, categorynames, 3);
+    const productmatches = matchExAx(e.text, e.tokens, productnames, 3)
+    const categorymatches = matchExAx(e.text, e.tokens, categorynames, 3)
     // store exact and approx matched product/category names on e.flags
     e.stash = {}
     // [ e.flags.exactProduct, e.flags.approxProduct ] = productmatches;

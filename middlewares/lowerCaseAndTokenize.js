@@ -1,3 +1,5 @@
+'use strict'
+
 const { WordTokenizer } = require('natural')
 const wordTokenizer = new WordTokenizer()
 

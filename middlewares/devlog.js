@@ -6,13 +6,13 @@ module.exports = (e, next) => {
               `e.stash.approxProduct: ${JSON.stringify(e.stash.approxProduct)}\n` +
               `e.stash.exactCategory: ${JSON.stringify(e.stash.exactCategory)}\n` +
               `e.stash.approxCategory: ${JSON.stringify(e.stash.approxCategory)}\n` +
+              `e.stash.hitProducts: ${JSON.stringify(e.stash.hitProducts)}\n` +
               `e.flags.wantsFeatures: ${e.flags.wantsFeatures}\n` +
               `e.flags.wantsPictures: ${e.flags.wantsPictures}\n` +
               `e.flags.wantsPrice: ${e.flags.wantsPrice}\n` +
               `e.flags.wantsRating: ${e.flags.wantsRating}\n` +
               `e.flags.wantsMin: ${e.flags.wantsMin}\n` +
               `e.flags.wantsMax: ${e.flags.wantsMax}\n` +
-              `e.flags.wantsAvg: ${e.flags.wantsAvg}\n` +
-              `e.stash: ${JSON.stringify(e.stash)}`)
+              `e.flags.wantsAvg: ${e.flags.wantsAvg}`)
   next()
 }

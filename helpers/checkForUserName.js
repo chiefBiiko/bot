@@ -1,3 +1,5 @@
+'use strict'
+
 const replaceOrNull = require('./replaceOrNull')
 const toTitleCase = require('./toTitleCase')
 
