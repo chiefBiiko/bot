@@ -134,7 +134,7 @@ describe('incoming middlewares', () => {
     },
     () => {})
     it('should set boolean flags as e.stash.hitProducts.*.flags.wants*', () => {
-      e.stash.hitProducts['iphone 7'].should.have.keys('flags')
+      e.stash.hitProducts['iphone 7'].flags.should.be.an('object')
       Object.keys(e.stash.hitProducts['iphone 7'].flags).forEach(flag => {
         e.stash.hitProducts['iphone 7'].flags[flag].should.be.a('boolean')
       })

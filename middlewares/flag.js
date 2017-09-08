@@ -3,23 +3,30 @@
 module.exports = (e, next) => {
   Object.keys(e.stash.hitProducts).forEach(product => {
     e.stash.hitProducts[product].flags = {
-      wantsFeatures: RegExp(`features?( of the)? ${product}`)
-                       .test(e.text),
-      wantsPictures: RegExp(`pictures?( (of)|(for) the)? ${product}`)
-                       .test(e.text),
-      wantsPrice: RegExp(`(price( (of)|(for) the)?)|(costs the) ${product}`)
-                       .test(e.text),
-      wantsRatings: RegExp(`(ratings?)|(reviews?)( (of)|(for) the)? ${product}`)
-                       .test(e.text),
-      wantsMinRating: RegExp(`(min)|(minimum)|(worst)|(badd?est) ` +
-                             `(rating)|(review)( (of)|(for) the)? ${product}`)
-                       .test(e.text),
-      wantsMaxRating: RegExp(`(max)|(maximum)|(best)|(highest) ` +
-                             `(rating)|(review)( (of)|(for) the)? ${product}`)
-                       .test(e.text),
-      wantsAvgRating: RegExp(`(avg)|(average)|(mean)|(median)|(mid(dle)?) ` +
-                             `(rating)|(review)( (of)|(for) the)? ${product}`)
-                       .test(e.text)
+      wantsFeatures:
+        RegExp(`features?(\s+of\s+the)?\s+${product}`)
+          .test(e.text),
+      wantsPictures:
+        RegExp(`pictures?(\s+(of)|(for)\s+the)?\s+${product}`)
+          .test(e.text),
+      wantsPrice:
+        RegExp(`(price(\s+(of)|(for)\s+the)?)|(costs\s+the)\s+${product}`)
+          .test(e.text),
+      wantsRatings:
+        RegExp(`(ratings?)|(reviews?)(\s+(of)|(for)\s+the)?\s+${product}`)
+          .test(e.text),
+      wantsMinRating:
+        RegExp(`(min)|(minimum)|(worst)|(badd?est)\s+(rating)|(review)` +
+               `(\s+(of)|(for)\s+the)?\s+${product}`)
+          .test(e.text),
+      wantsMaxRating:
+        RegExp(`(max)|(maximum)|(best)|(highest)\s+(rating)|(review)` +
+               `(\s+(of)|(for)\s+the)?\s+${product}`)
+          .test(e.text),
+      wantsAvgRating:
+        RegExp(`(avg)|(average)|(mean)|(median)|(mid(dle)?)\s+` +
+               `(rating)|(review)(\s+(of)|(for)\s+the)?\s+${product}`)
+          .test(e.text)
     }
   })
   // e.flags = {}
