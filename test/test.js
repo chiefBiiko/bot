@@ -133,15 +133,13 @@ describe('incoming middlewares', () => {
       }
     },
     () => {})
-    it('should set boolean flags as e.stash.hitProducts.*.wants*', () => {
-      for (const product of e.stash.hitProducts) {
-        product.should.have.keys('flags')
-        for (const flag of product.flags) {
-          flag.should.be.a('boolean')
-        }
-      }
+    it('should set boolean flags as e.stash.hitProducts.*.flags.wants*', () => {
+      e.stash.hitProducts['iphone 7'].should.have.keys('flags')
+      Object.keys(e.stash.hitProducts['iphone 7'].flags).forEach(flag => {
+        e.stash.hitProducts['iphone 7'].flags[flag].should.be.a('boolean')
+      })
       // e.flags.should.have.all.keys('wantsFeatures', 'wantsPictures',
-      //                              'wantsPrice', 'wantsRating',
+      //                              'wantsPrice', 'wantsRatings',
       //                              'wantsMin', 'wantsMax', 'wantsAvg')
       // Object.keys(e.flags).filter(flag => flag.startsWith('wants'))
       //   .forEach(wantsFlag => e.flags[wantsFlag].should.be.a('boolean'))
@@ -163,10 +161,10 @@ describe('incoming middlewares', () => {
                wantsFeatures: true,
                wantsPictures: false,
                wantsPrice: true,
-               wantsRating: false,
-               wantsMin: false,
-               wantsMax: false,
-               wantsAvg: false
+               wantsRatings: false,
+               wantsMinRating: false,
+               wantsMaxRating: false,
+               wantsAvgRating: false
             }
           }
         }
