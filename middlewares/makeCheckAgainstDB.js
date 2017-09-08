@@ -26,10 +26,10 @@ module.exports = (bp, minutes) => {
     e.stash = {}
     // [ e.flags.exactProduct, e.flags.approxProduct ] = productmatches;
     // [ e.flags.exactCategory, e.flags.approxCategory ] = categorymatches;
-    e.stash.exactProduct = productmatches.exact
-    e.stash.approxProduct = productmatches.approx
-    e.stash.exactCategory = categorymatches.exact
-    e.stash.approxCategory = categorymatches.approx
+    e.stash.exactProducts = productmatches.exact
+    e.stash.approxProducts = productmatches.approx
+    e.stash.exactCategories = categorymatches.exact
+    e.stash.approxCategories = categorymatches.approx
     // put all exact product hits from DB on e.stash
     e.stash.hitProducts = productmatches.exact.reduce((acc, cur) => {
       acc[cur] = DB[cur]

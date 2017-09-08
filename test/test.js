@@ -117,35 +117,67 @@ describe('incoming middlewares', () => {
     //...
   })
   describe('flag', () => {
-    const e = flag({ text: 'give me the average rating for the ipad pro' },
-                   () => {})
-    it('should set a bunch of boolean flags as e.flags.wants*', () => {
-      e.flags.should.have.all.keys('wantsFeatures', 'wantsPictures',
-                                   'wantsPrice', 'wantsRating',
-                                   'wantsMin', 'wantsMax', 'wantsAvg')
-      Object.keys(e.flags).filter(flag => flag.startsWith('wants'))
-        .forEach(wantsFlag => e.flags[wantsFlag].should.be.a('boolean'))
+    const e = flag({
+      text: 'tell me the price of the iphone 7',
+      stash: {
+        exactProducts: [ 'iphone 7' ],
+        hitProducts: {
+          'iphone 7' : {
+            category: 'smartphones',
+            features: [ 'hd-camera', 'siri' ],
+            pictures: [ 'iphront.png', 'iphback.png' ],
+            price: 900,
+            ratings: [ 4, 3, 5, 4, 3, 4, 3, 4, 1, 3 ],
+          }
+        }
+      }
+    },
+    () => {})
+    it('should set boolean flags as e.stash.hitProducts.*.wants*', () => {
+      for (const product of e.stash.hitProducts) {
+        product.should.have.keys('flags')
+        for (const flag of product.flags) {
+          flag.should.be.a('boolean')
+        }
+      }
+      // e.flags.should.have.all.keys('wantsFeatures', 'wantsPictures',
+      //                              'wantsPrice', 'wantsRating',
+      //                              'wantsMin', 'wantsMax', 'wantsAvg')
+      // Object.keys(e.flags).filter(flag => flag.startsWith('wants'))
+      //   .forEach(wantsFlag => e.flags[wantsFlag].should.be.a('boolean'))
     })
   })
   describe('assemble', () => {
-    const e = assemble({ stash: { exactProduct: ['iphone 7', 'ipad pro'] },
-                         flags: {
-                            wantsFeatures: true,
-                            wantsPictures: false,
-                            wantsPrice: true,
-                            wantsRating: false,
-                            wantsMin: false,
-                            wantsMax: false,
-                            wantsAvg: false
-                         }
-                       },
-                       () => {})
+    const e = assemble({
+      text: 'tell me the price of the iphone 7',
+      stash: {
+        exactProducts: [ 'iphone 7' ],
+        hitProducts: {
+          'iphone 7' : {
+            category: 'smartphones',
+            features: [ 'hd-camera', 'siri' ],
+            pictures: [ 'iphront.png', 'iphback.png' ],
+            price: 900,
+            ratings: [ 4, 3, 5, 4, 3, 4, 3, 4, 1, 3 ],
+            flags: {
+               wantsFeatures: true,
+               wantsPictures: false,
+               wantsPrice: true,
+               wantsRating: false,
+               wantsMin: false,
+               wantsMax: false,
+               wantsAvg: false
+            }
+          }
+        }
+      }
+    },
+    () => {})
     it('should add a new object under .patch on e', () => {
       e.should.have.keys('patch')
     })
     it('should add an array of text chunks for each exact product hit', () => {
       e.patch['iphone 7'].should.be.an('array')
-      e.patch['ipad pro'].should.be.an('array')
     })
   })
 })
