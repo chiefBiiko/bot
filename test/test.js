@@ -23,6 +23,10 @@ describe('helpers', () => {
     it('should format an array to a semantic sequence', () => {
       andFmtArr(['a', 'b', 'c']).should.equal('a, b, and c')
     })
+    it('should handle empty and length-one arrays', () => {
+      andFmtArr([]).should.equal('')
+      andFmtArr([1]).should.equal('1')
+    })
   })
   describe('toTitleCase', () => {
     it('should uppercase the first letter of a string', () => {
@@ -75,7 +79,7 @@ describe('helpers', () => {
         afmap.should.be.empty
         done()
       }, 1000 * 61)       // exec timeout
-    }).timeout(1000 * 62) // test timeout
+    }).timeout(1000 * 63) // test timeout
   })
 })
 
