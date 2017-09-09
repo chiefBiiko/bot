@@ -10,10 +10,12 @@ const replaceOrNull = require('./../helpers/replaceOrNull')
 const matchExAx = require('./../helpers/matchExAx')
 const makeActiveMap = require('./../helpers/makeActiveMap')
 
-const lowerCaseAndTokenize = require('./../middlewares/lowerCaseAndTokenize')
+const tokenizeText = require('./../middlewares/tokenizeText')
 const makeManageSessions = require('./../middlewares/makeManageSessions')
 const flag = require('./../middlewares/flag')
-const patch = require('./../middlewares/patch')
+const patchProductInfo = require('./../middlewares/patchProductInfo')
+
+const normalizeText = require('./../middlewares/normalizeText')
 
 describe('helpers', () => {
   describe('andFmtArr', () => {
@@ -84,13 +86,10 @@ describe('helpers', () => {
 })
 
 describe('incoming middlewares', () => {
-  describe('lowerCaseAndTokenize', () => {
-    const e = lowerCaseAndTokenize({ text: 'Hi Ho' }, () => {})
+  describe('tokenizeText', () => {
+    const e = tokenizeText({ text: 'Hi Ho' }, () => {})
     it('should return an object (e)', () => {
       e.should.be.an('object')
-    })
-    it('should return e with a lowercased text property value', () => {
-      RegExp('[A-Z]').test(e.text).should.be.false
     })
     it('should return e with an array for .tokens', () => {
       e.tokens.should.be.an('array')
@@ -118,7 +117,9 @@ describe('incoming middlewares', () => {
     })
   })
   describe('makeCheckAgainstDB', () => {
-    //...
+    it('should be tested...', () => {
+      null.should.be.tested
+    })
   })
   describe('flag', () => {
     const e = flag({
@@ -142,15 +143,10 @@ describe('incoming middlewares', () => {
       Object.keys(e.stash.hitProducts['iphone 7'].flags).forEach(flag => {
         e.stash.hitProducts['iphone 7'].flags[flag].should.be.a('boolean')
       })
-      // e.flags.should.have.all.keys('wantsFeatures', 'wantsPictures',
-      //                              'wantsPrice', 'wantsRatings',
-      //                              'wantsMin', 'wantsMax', 'wantsAvg')
-      // Object.keys(e.flags).filter(flag => flag.startsWith('wants'))
-      //   .forEach(wantsFlag => e.flags[wantsFlag].should.be.a('boolean'))
     })
   })
-  describe('patch', () => {
-    const e = patch({
+  describe('patchProductInfo', () => {
+    const e = patchProductInfo({
       text: 'tell me the price of the iphone 7',
       stash: {
         exactProducts: [ 'iphone 7' ],
@@ -177,6 +173,15 @@ describe('incoming middlewares', () => {
     () => {})
     it('should add a string under e.stash.hitProducts.*.patch', () => {
       e.stash.hitProducts['iphone 7'].patch.should.be.a('string')
+    })
+  })
+})
+
+describe('outgoing middlewares', () => {
+  describe('normalizeText', () => {
+    it('should clean the response text from clear clutter', () => {
+      normalizeText({ text: 'It costs costs 5€' }, () => {}).text
+        .should.equal('It costs 5€')
     })
   })
 })

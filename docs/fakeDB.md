@@ -5,24 +5,27 @@ below has been set as a database mini sample; for initial development only:
 ```js
 // 4 dev: bp.db.kvs has a products object which looks like this
 {
-  'galaxy s9': {
-    category: 'smartphones',
+  'Galaxy S9': {
+    category: 'Smartphones',
+    manufacturer: 'Samsung',
     features: [ 'durable', 'sustainable' ],
-    pictures: [ 's9front.png', 's9back.png' ],
+    pictures: [ 'front.png', 'back.png' ],
     price: 500,
     ratings: [ 2, 3, 5, 4, 2, 4, 3, 4, 1, 5 ]
   },
-  'iphone 7' : {
-    category: 'smartphones',
-    features: [ 'hd-camera', 'siri' ],
-    pictures: [ 'iphront.png', 'iphback.png' ],
+  'iPhone 7' : {
+    category: 'Smartphones',
+    manufacturer: 'Apple',
+    features: [ 'HD-camera', 'Siri' ],
+    pictures: [ 'front.png', 'back.png' ],
     price: 900,
     ratings: [ 4, 3, 5, 4, 3, 4, 3, 4, 1, 3 ]
   },
-  'ipad pro' : {
-    category: 'tablets',
-    features: [ 'hd-camera', 'siri' ],
-    pictures: [ 'ipront.png', 'ipack.png' ],
+  'iPad Pro' : {
+    category: 'Tablets',
+    manufacturer: 'Apple',
+    features: [ 'HD-camera', 'Siri' ],
+    pictures: [ 'front.png', 'back.png' ],
     price: 1100,
     ratings: [ 4, 3, 5, 4, 3, 4, 3, 4, 1, 3 ]
   }

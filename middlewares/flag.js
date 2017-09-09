@@ -6,42 +6,42 @@ module.exports = (e, next) => {
       features:
         // RegExp(`features?.{0,13}(\s*of\s*the)?\s*${product}`)
         RegExp(`(features?.{0,23}(the)?${product})|` +
-               `(${product}.{0,23}features?)`)
+               `(${product}.{0,23}features?)`, 'i')
           .test(e.text),
       pictures:
         // RegExp(`pictures?.{0,13}(\s*(of)|(for)\s*the)?\s*${product}`)
         RegExp(`(pictures?.{0,23}(the)?${product})|` +
-               `(${product}.{0,23}pictures?)`)
+               `(${product}.{0,23}pictures?)`, 'i')
           .test(e.text),
       price:
         // RegExp(`(price.{0,13}(\s*(of)|(for)\s*the)?)|(costs\s*the)\s*` +
         //        `${product}`)
         RegExp(`((price)|(cost).{0,23}(the)?${product})|` +
-               `(${product}.{0,23}(price)|(cost))`)
+               `(${product}.{0,23}(price)|(cost))`, 'i')
           .test(e.text),
       ratings:
         // RegExp(`(ratings?)|(reviews?).{0,13}(\s*(of)|(for)\s*the)?\s*` +
         //        `${product}`)
         RegExp(`((ratings?)|(reviews?).{0,23}(the)?${product})|` +
-               `(${product}.{0,23}(ratings?)|(reviews?))`)
+               `(${product}.{0,23}(ratings?)|(reviews?))`, 'i')
           .test(e.text),
       wantsMinRating:
         // RegExp(`(min)|(minimum)|(worst)|(badd?est)\s*(rating)|(review).{0,13}` +
         //        `(\s*(of)|(for)\s*the)?\s*${product}`)
         RegExp(`(min)|(minimum)|(worst)|(badd?est)\s*(rating)|(review).{0,23}` +
-               `(the)?\s*${product}`)
+               `(the)?\s*${product}`, 'i')
           .test(e.text),
       wantsMaxRating:
         // RegExp(`(max)|(maximum)|(best)|(highest)\s*(rating)|(review).{0,13}` +
         //        `(\s*(of)|(for)\s*the)?\s*${product}`)
         RegExp(`(max)|(maximum)|(best)|(highest)\s*(rating)|(review).{0,23}` +
-               `(the)?\s*${product}`)
+               `(the)?\s*${product}`, 'i')
           .test(e.text),
       wantsAvgRating:
         // RegExp(`(avg)|(average)|(mean)|(median)|(mid(dle)?)\s*` +
         //        `(rating)|(review).{0,13}(\s*(of)|(for)\s*the)?\s*${product}`)
         RegExp(`(avg)|(average)|(mean)|(median)|(mid(dle)?)\s*` +
-               `(rating)|(review).{0,23}(the)?\s*${product}`)
+               `(rating)|(review).{0,23}(the)?\s*${product}`, 'i')
           .test(e.text)
     }
   })

@@ -24,13 +24,15 @@ module.exports = (bp, SESSIONS) => {
       session.last_stamp = new Date().getTime()
       if (/hi|hallo|hello|hey/.test(e.text)) {
         session.convo.say('#welcome-again', { first_name: first_name })
+        return
       }
       if (/say that again/.test(e.text)) {
         session.convo.repeat()
+        return
       }
       SESSIONS.set(e.user.id, session)
+      next()
     }
-    next()
     return e // 4 dev tests only, ignored by botpress
   }
   // return a closure

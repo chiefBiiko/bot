@@ -6,7 +6,7 @@ module.exports = (e, next) => {
   Object.keys(e.stash.hitProducts).forEach(pname => {
     const patches = // assemble an array of statements for each product
       Object.keys(e.stash.hitProducts[pname].flags)
-        .filter(flag => e.stash.hitProducts[pname].flags[flag]) // get all truthy
+        .filter(flag => e.stash.hitProducts[pname].flags[flag]) // flag: bool
         .map(flag => {
           switch(flag) {
             case 'features':
