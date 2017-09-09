@@ -10,34 +10,27 @@ welcome:
 welcome-again:
   - text: Hey we have already met {{first_name}}
 
-hit:
-  - text: Bingo! {{patch}}
-    typing: 1s
+hit-product:
+    text:
+      - Bingo! {{patch}}
+      - Here you go. {{patch}}
+      - Ok. {{patch}}
 
-exact-product-feature:
-  - text:
-      - Here is a list of features for the {{product}}...{{features}}
-      - The main features of the {{product}} are {{features}}
-    typing: 1s
+hit-category:
+    text:
+      - Ok. What do you want to know about {{category}}?
 
-exact-product-picture:
-  - text:
-      - Here are some pictures for the {{product}}...[pictures]
-      - It looks better in your hands but here are some pics...[pictures]
-    typing: 1s
+assert-product:
+    text:
+      - Are you talking about the {{product}}?
+      - Guessing a little...looking for the {{product}}?
 
-exact-product-only:
-  - text:
-      - Here is a product card for the {{product}}...[card]
-      - Have a look at this product brief for the {{product}}...[card]
-    typing: 1s
+assert-category:
+    text:
+      - Do you mean {{category}}?
 
-approx-product-only:  # send y/n choice along n send 2 #exact-product-only if y
-  - wait: 1s
-  - text: Guessing a little...looking for the {{product}}?  # catch user input!
-    typing: 1s
-
-goodbye:
-  - text: You are leaving because of reason {{reason}}
-    typing: true
-  - Hope to see you back again soon! # if no other properties, you can just send a strings
+fallback:
+    text:
+      - Sorry, I did not understand that
+      - Hm, not sure what you mean
+      - what?

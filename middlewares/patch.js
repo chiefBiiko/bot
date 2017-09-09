@@ -13,7 +13,7 @@ module.exports = (e, next) => {
               return `has ${['these', 'cool'][Math.round(Math.random())]} ` +
                 `features - ${andFmtArr(e.stash.hitProducts[pname].features)}`
             case 'pictures':
-              return `looks better in your hands, but here are some pics - ` +
+              return `here are some pics - ` +
                 `${andFmtArr(e.stash.hitProducts[pname].pictures)}`
             case 'price':
               return `costs ${e.stash.hitProducts[pname].price}€`

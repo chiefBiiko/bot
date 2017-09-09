@@ -13,12 +13,31 @@ module.exports = bp => {
   // make one hear handler that checks there is an exact product and then if else to supply the correct rreply!!!!
   // exact product and attribute except rating
   bp.hear({
-    stash: obj => Object.keys(obj.hitProducts).length !== 0 // GOOD
+    text: /.+/
+    // stash: obj => Object.keys(obj.hitProducts).length !== 0 // GOOD
   }, (e, next) => {
     const session = SESSIONS.get(e.user.id)
-    Object.keys(e.stash.hitProducts).forEach(pname => {
-      session.convo.say('#hit', { patch: e.stash.hitProducts[pname].patch })
-    })
+    if (Object.keys(e.stash.hitProducts).length !== 0) {
+      Object.keys(e.stash.hitProducts).forEach(pname => {
+        session.convo.say('#hit-product', {
+          patch: e.stash.hitProducts[pname].patch
+        })
+      })
+    } else if (e.stash.approxProducts.length !== 0) {
+      session.convo.say('#assert-product', {
+        product: e.stash.approxProducts[0]
+      })
+    } else if (e.stash.exactCategories.length !== 0) {
+      session.convo.say('#hit-category', {
+        category: e.stash.exactCategories[0]
+      })
+    } else if (e.stash.approxCategories.length !== 0) {
+      session.convo.say('#assert-category', {
+        category: e.stash.approxCategories[0]
+      })
+    } else {
+      session.convo.say('#fallback')
+    }
     // e.reply('#exact-product-feature', { // TODO
     //   product: 'noop'//e.exactProduct[0]
     // //,features: andFmtArr(DB[e.exactProduct[0]].features)//DB[e.exactProduct[0]].features.join(', ')
