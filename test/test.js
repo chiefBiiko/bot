@@ -13,7 +13,7 @@ const makeActiveMap = require('./../helpers/makeActiveMap')
 const lowerCaseAndTokenize = require('./../middlewares/lowerCaseAndTokenize')
 const makeManageSessions = require('./../middlewares/makeManageSessions')
 const flag = require('./../middlewares/flag')
-const assemble = require('./../middlewares/assemble')
+const patch = require('./../middlewares/patch')
 
 describe('helpers', () => {
   describe('andFmtArr', () => {
@@ -145,8 +145,8 @@ describe('incoming middlewares', () => {
       //   .forEach(wantsFlag => e.flags[wantsFlag].should.be.a('boolean'))
     })
   })
-  describe('assemble', () => {
-    const e = assemble({
+  describe('patch', () => {
+    const e = patch({
       text: 'tell me the price of the iphone 7',
       stash: {
         exactProducts: [ 'iphone 7' ],
@@ -158,10 +158,10 @@ describe('incoming middlewares', () => {
             price: 900,
             ratings: [ 4, 3, 5, 4, 3, 4, 3, 4, 1, 3 ],
             flags: {
-               wantsFeatures: true,
-               wantsPictures: false,
-               wantsPrice: true,
-               wantsRatings: false,
+               features: false,
+               pictures: false,
+               price: true,
+               ratings: false,
                wantsMinRating: false,
                wantsMaxRating: false,
                wantsAvgRating: false
@@ -171,11 +171,8 @@ describe('incoming middlewares', () => {
       }
     },
     () => {})
-    it('should add a new object under .patch on e', () => {
-      e.should.have.keys('patch')
-    })
-    it('should add an array of text chunks for each exact product hit', () => {
-      e.patch['iphone 7'].should.be.an('array')
+    it('should add a string under e.stash.hitProducts.*.patch', () => {
+      e.stash.hitProducts['iphone 7'].patch.should.be.a('string')
     })
   })
 })

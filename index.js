@@ -13,8 +13,12 @@ module.exports = bp => {
   // make one hear handler that checks there is an exact product and then if else to supply the correct rreply!!!!
   // exact product and attribute except rating
   bp.hear({
-    stash: obj => obj.exactProduct.length !== 0 // GOOD
+    stash: obj => Object.keys(obj.hitProducts).length !== 0 // GOOD
   }, (e, next) => {
+    const session = SESSIONS.get(e.user.id)
+    Object.keys(e.stash.hitProducts).forEach(pname => {
+    //session.convo.say(e.stash.hitProducts[pname].patch)
+    })
     // e.reply('#exact-product-feature', { // TODO
     //   product: 'noop'//e.exactProduct[0]
     // //,features: andFmtArr(DB[e.exactProduct[0]].features)//DB[e.exactProduct[0]].features.join(', ')
@@ -103,9 +107,17 @@ module.exports = bp => {
     description: '...'
   })
   bp.middlewares.register({
-    name: 'devlog',
+    name: 'patch',
     type: 'incoming',
     order: 5,
+    handler: require('./middlewares/patch'),
+    module: undefined,
+    description: '...'
+  })
+  bp.middlewares.register({
+    name: 'devlog',
+    type: 'incoming',
+    order: 6,
     handler: require('./middlewares/devlog'),
     module: undefined,
     description: '...'

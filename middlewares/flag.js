@@ -3,29 +3,31 @@
 module.exports = (e, next) => {
   Object.keys(e.stash.hitProducts).forEach(product => {
     e.stash.hitProducts[product].flags = {
-      wantsFeatures:
-        RegExp(`features?(\s+of\s+the)?\s+${product}`)
+      features:
+        RegExp(`features?.{0,13}(\s+of\s+the)?\s+${product}`)
           .test(e.text),
-      wantsPictures:
-        RegExp(`pictures?(\s+(of)|(for)\s+the)?\s+${product}`)
+      pictures:
+        RegExp(`pictures?.{0,13}(\s+(of)|(for)\s+the)?\s+${product}`)
           .test(e.text),
-      wantsPrice:
-        RegExp(`(price(\s+(of)|(for)\s+the)?)|(costs\s+the)\s+${product}`)
+      price:
+        RegExp(`(price.{0,13}(\s+(of)|(for)\s+the)?)|(costs\s+the)\s+` +
+               `${product}`)
           .test(e.text),
-      wantsRatings:
-        RegExp(`(ratings?)|(reviews?)(\s+(of)|(for)\s+the)?\s+${product}`)
+      ratings:
+        RegExp(`(ratings?)|(reviews?).{0,13}(\s+(of)|(for)\s+the)?\s+` +
+               `${product}`)
           .test(e.text),
       wantsMinRating:
-        RegExp(`(min)|(minimum)|(worst)|(badd?est)\s+(rating)|(review)` +
+        RegExp(`(min)|(minimum)|(worst)|(badd?est)\s+(rating)|(review).{0,13}` +
                `(\s+(of)|(for)\s+the)?\s+${product}`)
           .test(e.text),
       wantsMaxRating:
-        RegExp(`(max)|(maximum)|(best)|(highest)\s+(rating)|(review)` +
+        RegExp(`(max)|(maximum)|(best)|(highest)\s+(rating)|(review).{0,13}` +
                `(\s+(of)|(for)\s+the)?\s+${product}`)
           .test(e.text),
       wantsAvgRating:
         RegExp(`(avg)|(average)|(mean)|(median)|(mid(dle)?)\s+` +
-               `(rating)|(review)(\s+(of)|(for)\s+the)?\s+${product}`)
+               `(rating)|(review).{0,13}(\s+(of)|(for)\s+the)?\s+${product}`)
           .test(e.text)
     }
   })
