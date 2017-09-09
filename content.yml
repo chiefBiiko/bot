@@ -10,6 +10,10 @@ welcome:
 welcome-again:
   - text: Hey we have already met {{first_name}}
 
+hit:
+  - text: Bingo! {{patch}}
+    typing: 1s
+
 exact-product-feature:
   - text:
       - Here is a list of features for the {{product}}...{{features}}

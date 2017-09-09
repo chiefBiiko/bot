@@ -11,9 +11,9 @@ module.exports = (e, next) => {
           switch(flag) {
             case 'features':
               return `has ${['these', 'cool'][Math.round(Math.random())]} ` +
-                `features: ${andFmtArr(e.stash.hitProducts[pname].features)}`
+                `features - ${andFmtArr(e.stash.hitProducts[pname].features)}`
             case 'pictures':
-              return `looks better in your hands, but here are some pics: ` +
+              return `looks better in your hands, but here are some pics - ` +
                 `${andFmtArr(e.stash.hitProducts[pname].pictures)}`
             case 'price':
               return `costs ${e.stash.hitProducts[pname].price}€`

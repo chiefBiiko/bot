@@ -17,7 +17,7 @@ module.exports = bp => {
   }, (e, next) => {
     const session = SESSIONS.get(e.user.id)
     Object.keys(e.stash.hitProducts).forEach(pname => {
-    //session.convo.say(e.stash.hitProducts[pname].patch)
+      session.convo.say('#hit', { patch: e.stash.hitProducts[pname].patch })
     })
     // e.reply('#exact-product-feature', { // TODO
     //   product: 'noop'//e.exactProduct[0]
