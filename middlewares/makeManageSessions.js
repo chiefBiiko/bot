@@ -22,12 +22,8 @@ module.exports = (bp, SESSIONS) => {
       }
       session.last_query = e.text,
       session.last_stamp = new Date().getTime()
-      if (/hi|hallo|hello|hey/.test(e.text)) {
+      if (/hi|hallo|hello|hey/i.test(e.text)) {
         session.convo.say('#welcome-again', { first_name: first_name })
-        return
-      }
-      if (/say that again/.test(e.text)) {
-        session.convo.repeat()
         return
       }
       SESSIONS.set(e.user.id, session)

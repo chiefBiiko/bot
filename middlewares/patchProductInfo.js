@@ -18,10 +18,7 @@ module.exports = (e, next) => {
             case 'price':
               return `costs ${e.stash.hitProducts[pname].price}€`
             case 'ratings':
-              return `has an average rating of ` +
-                `${e.stash.hitProducts[pname].ratings.reduce((a, c) => a + c) /
-                  e.stash.hitProducts[pname].ratings.length} out of ` +
-                `${e.stash.hitProducts[pname].ratings.length} ratings`
+              return `got ${e.stash.hitProducts[pname].ratings.length} ratings`
             case 'wantsMinRating':
               return `has a minimum rating of ` +
                 `${Math.min(...e.stash.hitProducts[pname].ratings)}`

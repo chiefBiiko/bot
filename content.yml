@@ -34,3 +34,6 @@ fallback:
       - Sorry, I did not understand that
       - Hm, not sure what you mean
       - what?
+
+repeat:
+    text: {{last_outgoing}}

@@ -12,10 +12,11 @@ const makeActiveMap = require('./../helpers/makeActiveMap')
 
 const tokenizeText = require('./../middlewares/tokenizeText')
 const makeManageSessions = require('./../middlewares/makeManageSessions')
+const makeRepeatOutgoing = require('./../middlewares/makeRepeatOutgoing')
 const flag = require('./../middlewares/flag')
 const patchProductInfo = require('./../middlewares/patchProductInfo')
 
-const normalizeText = require('./../middlewares/normalizeText')
+const makeStoreOutgoing = require('./../middlewares/makeStoreOutgoing')
 
 describe('helpers', () => {
   describe('andFmtArr', () => {
@@ -72,13 +73,13 @@ describe('helpers', () => {
   })
   describe('makeActiveMap', () => {
     it('should return an ~auto-flush map', done => {
-      const afmap = makeActiveMap(1)
-      afmap.set('testsession', {
+      const SESSIONS = makeActiveMap(1)
+      SESSIONS.set('testsession', {
         convo: { stop: () => {} }, // stop() must be implemented
         last_stamp: 1504786753609 // .last_stamp must be a timestamp
       })
       setTimeout(() => {
-        afmap.should.be.empty
+        SESSIONS.should.be.empty
         done()
       }, 1000 * 61)       // exec timeout
     }).timeout(1000 * 63) // test timeout
@@ -114,6 +115,16 @@ describe('incoming middlewares', () => {
       session.should.be.an('object')
       session.should.have.all.keys('convo', 'first_name', 'last_query',
                                    'last_stamp')
+    })
+  })
+  describe('makeRepeatOutgoing', () => {
+    const SESSIONS = makeActiveMap(1)
+    const repeatOutgoing = makeRepeatOutgoing(SESSIONS)
+    it('should return a function', () => {
+      repeatOutgoing.should.be.a('function')
+    })
+    it('should have more tests...', () => {
+      null.should.be.tested
     })
   })
   describe('makeCheckAgainstDB', () => {
@@ -178,10 +189,20 @@ describe('incoming middlewares', () => {
 })
 
 describe('outgoing middlewares', () => {
-  describe('normalizeText', () => {
-    it('should clean the response text from clear clutter', () => {
-      normalizeText({ text: 'It costs costs 5€' }, () => {}).text
-        .should.equal('It costs 5€')
+  describe('makeStoreOutgoing', () => {
+    const SESSIONS = makeActiveMap(1) // dependency
+    const storeOutgoing = makeStoreOutgoing(SESSIONS) // closure
+    it('should return a function', () => {
+      storeOutgoing.should.be.a('function')
     })
+    it('should factor a function that sets session.convo.last_outgoing ' +
+       'on each member of SESSIONS', () => {
+         SESSIONS.set('xyz', {
+           convo: { stop: () => {} }, // stop() must be implemented
+           last_stamp: 1504786753609 // .last_stamp must be a timestamp
+         })
+         storeOutgoing({ text: 'last-sent msg', user: { id: 'xyz' } }, () => {})
+         SESSIONS.get('xyz').last_outgoing.should.be.a('string')
+       })
   })
 })
