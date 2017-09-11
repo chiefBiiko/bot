@@ -17,7 +17,7 @@ module.exports = (bp, SESSIONS) => {
       })
     } else { // existing session
       const session = SESSIONS.get(e.user.id)
-      if (first_name.length !== 0 ) {
+      if (first_name) {
         session.first_name = first_name
       }
       session.last_query = e.text,
