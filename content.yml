@@ -10,6 +10,9 @@ welcome:
 welcome-again:
   - text: Hey we have already met {{first_name}}
 
+nice2meet:
+  - text: Nice to meet you {{first_name}}
+
 hit-product:
     text:
       - Bingo! {{patch}}
@@ -36,4 +39,5 @@ fallback:
       - what?
 
 repeat:
-    text: {{last_outgoing}}
+    text:
+      - ...{{last_outgoing}}

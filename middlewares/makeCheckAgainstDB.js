@@ -10,7 +10,7 @@ module.exports = (bp, minutes) => {
   setInterval(() => { // updating DB every minutes
     console.log(`updating DB @ ${new Date().toUTCString()}...`)
     bp.db.kvs.get('products').then(db => DB = db).catch(console.error)
-    console.log(DB)
+  //console.log(DB)
   }, 1000 * 60 * minutes)
   // assemble factory return
   const checkAgainstDB = (e, next) => { // closes over DB
@@ -24,8 +24,6 @@ module.exports = (bp, minutes) => {
     const categorymatches = matchExAx(e.text, e.tokens, categorynames, 3)
     // store exact and approx matched product/category names on e.flags
     e.stash = {}
-    // [ e.flags.exactProduct, e.flags.approxProduct ] = productmatches;
-    // [ e.flags.exactCategory, e.flags.approxCategory ] = categorymatches;
     e.stash.exactProducts = productmatches.exact
     e.stash.approxProducts = productmatches.approx
     e.stash.exactCategories = categorymatches.exact
@@ -38,6 +36,6 @@ module.exports = (bp, minutes) => {
     next()
     return e // 4 dev tests only, ignored by botpress
   }
-  // return a closure
+  // returning a closure
   return checkAgainstDB
 }

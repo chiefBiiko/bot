@@ -12,9 +12,10 @@ const makeActiveMap = require('./../helpers/makeActiveMap')
 
 const tokenizeText = require('./../middlewares/tokenizeText')
 const makeManageSessions = require('./../middlewares/makeManageSessions')
-const makeRepeatOutgoing = require('./../middlewares/makeRepeatOutgoing')
+const makeMaybeRepeat = require('./../middlewares/makeMaybeRepeat')
 const flag = require('./../middlewares/flag')
 const patchProductInfo = require('./../middlewares/patchProductInfo')
+const makeChooseResponse = require('./../middlewares/makeChooseResponse')
 
 const makeStoreOutgoing = require('./../middlewares/makeStoreOutgoing')
 
@@ -117,14 +118,14 @@ describe('incoming middlewares', () => {
                                    'last_stamp')
     })
   })
-  describe('makeRepeatOutgoing', () => {
-    const SESSIONS = makeActiveMap(1)
-    const repeatOutgoing = makeRepeatOutgoing(SESSIONS)
+  describe('makeMaybeRepeat', () => {
+    const SESSIONS = makeActiveMap(1) // dependency
+    const maybeRepeat = makeMaybeRepeat(SESSIONS)
     it('should return a function', () => {
-      repeatOutgoing.should.be.a('function')
+      maybeRepeat.should.be.a('function')
     })
     it('should have more tests...', () => {
-      null.should.be.tested
+      null.should.have.more.tests
     })
   })
   describe('makeCheckAgainstDB', () => {
@@ -186,6 +187,15 @@ describe('incoming middlewares', () => {
       e.stash.hitProducts['iphone 7'].patch.should.be.a('string')
     })
   })
+  describe('makeChooseResponse', () => {
+    const SESSIONS = makeActiveMap(1) // dependency
+    it('should return a function', () => {
+      makeChooseResponse(SESSIONS).should.be.a('function')
+    })
+    it('should have more tests...', () => {
+      null.should.have.more.tests
+    })
+  })
 })
 
 describe('outgoing middlewares', () => {
@@ -195,8 +205,8 @@ describe('outgoing middlewares', () => {
     it('should return a function', () => {
       storeOutgoing.should.be.a('function')
     })
-    it('should factor a function that sets session.convo.last_outgoing ' +
-       'on each member of SESSIONS', () => {
+    it('should factor a function that sets a string property ' +
+       'session.convo.last_outgoing on each member of SESSIONS', () => {
          SESSIONS.set('xyz', {
            convo: { stop: () => {} }, // stop() must be implemented
            last_stamp: 1504786753609 // .last_stamp must be a timestamp

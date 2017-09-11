@@ -17,13 +17,17 @@ module.exports = (bp, SESSIONS) => {
       })
     } else { // existing session
       const session = SESSIONS.get(e.user.id)
-      if (first_name) {
+      if (!session.first_name && first_name) {
         session.first_name = first_name
+        session.convo.say('#nice2meet', { first_name: first_name })
+        return
       }
       session.last_query = e.text,
       session.last_stamp = new Date().getTime()
-      if (/hi|hallo|hello|hey/i.test(e.text)) {
-        session.convo.say('#welcome-again', { first_name: first_name })
+      if (/^(hi|hallo|hello|hey).{0,17}/i.test(e.text)) {
+        session.convo.say('#welcome-again', {
+          first_name: session.first_name || first_name
+        })
         return
       }
       SESSIONS.set(e.user.id, session)
@@ -31,6 +35,6 @@ module.exports = (bp, SESSIONS) => {
     }
     return e // 4 dev tests only, ignored by botpress
   }
-  // return a closure
+  // returning a closure
   return manageSessions
 }

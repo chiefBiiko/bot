@@ -4,32 +4,6 @@ const SESSIONS = require('./helpers/makeActiveMap')(10)
 
 module.exports = bp => {
 
-  bp.hear({ text: /.+/ }, (e, next) => {
-    const session = SESSIONS.get(e.user.id)
-    if (Object.keys(e.stash.hitProducts).length !== 0) {
-      Object.keys(e.stash.hitProducts).forEach(pname => {
-        session.convo.say('#hit-product', {
-          patch: e.stash.hitProducts[pname].patch
-        })
-      })
-    } else if (e.stash.approxProducts.length !== 0) {
-      session.convo.say('#assert-product', {
-        product: e.stash.approxProducts[0]
-      })
-    } else if (e.stash.exactCategories.length !== 0) {
-      session.convo.say('#hit-category', {
-        category: e.stash.exactCategories[0]
-      })
-    } else if (e.stash.approxCategories.length !== 0) {
-      session.convo.say('#assert-category', {
-        category: e.stash.approxCategories[0]
-      })
-    } else {
-      session.convo.say('#fallback')
-    }
-    next()
-  })
-
   // registering middlewares
   bp.middlewares.register({
     name: 'tokenizeText', // friendly name
@@ -44,10 +18,10 @@ module.exports = bp => {
     handler: require('./middlewares/makeManageSessions')(bp, SESSIONS)
   })
   bp.middlewares.register({
-    name: 'makeRepeatOutgoing',
+    name: 'maybeRepeat',
     type: 'incoming',
     order: 3,
-    handler: require('./middlewares/makeRepeatOutgoing')(SESSIONS)
+    handler: require('./middlewares/makeMaybeRepeat')(SESSIONS)
   })
   bp.middlewares.register({
     name: 'checkAgainstDB',
@@ -74,13 +48,19 @@ module.exports = bp => {
     handler: require('./middlewares/devlog')
   })
   bp.middlewares.register({
+    name: 'chooseResponse',
+    type: 'incoming',
+    order: 8,
+    handler: require('./middlewares/makeChooseResponse')(SESSIONS)
+  })
+  bp.middlewares.register({
     name: 'storeOutgoing',
     type: 'outgoing',
-    order: 8,
+    order: 9,
     handler: require('./middlewares/makeStoreOutgoing')(SESSIONS)
   })
 
-  // reload middlewares
+  // reloading middlewares
   bp.middlewares.load()
 
 }
