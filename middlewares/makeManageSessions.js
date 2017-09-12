@@ -16,6 +16,7 @@ module.exports = (bp, SESSIONS) => {
         last_stamp: new Date().getTime(),
         onyes: ''
       })
+      return
     } else { // existing session
       const session = SESSIONS.get(e.user.id)
       session.last_query = e.text,
@@ -37,8 +38,8 @@ module.exports = (bp, SESSIONS) => {
         })
         return
       }
-      next()
     }
+    next()
     return e // 4 dev tests only, ignored by botpress
   }
   // returning a closure

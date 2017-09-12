@@ -15,7 +15,8 @@ module.exports = (SESSIONS) => {
        const assertProductKey = Object.keys(e.stash.approxProducts)[0]
        const assertProductVal = e.stash.approxProducts[assertProductKey]
        session.convo.say('#assert-product', { product: assertProductVal })
-       session.onyes = e.text.replace(assertProductKey, assertProductVal) // NEW
+       session.onyes = e.text.replace(RegExp(assertProductKey, 'g'),
+                                      assertProductVal) // NEW
      } else if (e.stash.exactCategories.length !== 0) {
        session.convo.say('#hit-category', {
          category: e.stash.exactCategories[0]
@@ -24,7 +25,8 @@ module.exports = (SESSIONS) => {
        const assertCategoryKey = Object.keys(e.stash.approxCategories)[0]
        const assertCategoryVal = e.stash.approxCategories[assertCategoryKey]
        session.convo.say('#assert-category', { category: assertCategoryVal })
-       session.onyes = e.text.replace(assertCategoryKey, assertCategoryVal) // NEW
+       session.onyes = e.text.replace(RegExp(assertCategoryKey, 'g'),
+                                      assertCategoryVal) // NEW
      } else {
        session.convo.say('#fallback')
      }

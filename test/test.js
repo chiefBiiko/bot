@@ -10,7 +10,7 @@ const replaceOrFalsy = require('./../helpers/replaceOrFalsy')
 const matchExAx = require('./../helpers/matchExAx')
 const makeActiveMap = require('./../helpers/makeActiveMap')
 
-const makeCheckYN = require('./../middlewares/makeCheckYN')
+const makeCheckYes = require('./../middlewares/makeCheckYes')
 const makeManageSessions = require('./../middlewares/makeManageSessions')
 const tokenizeText = require('./../middlewares/tokenizeText')
 const makeRageScorer = require('./../middlewares/makeRageScorer')
@@ -44,9 +44,6 @@ describe('helpers', () => {
     })
   })
   describe('checkForUserName', () => {
-    it('should extract a name from a "i am..." statement', () => {
-      checkForUserName('hi, i am ananse').should.equal('Ananse')
-    })
     it('should extract a name from a "my name is..." statement', () => {
       checkForUserName('wahala my name is kweku mensa').should.equal('Kweku')
     })
@@ -92,7 +89,7 @@ describe('helpers', () => {
   })
 })
 
-describe('incoming middlewares', () => {
+describe('middlewares', () => {
   describe('makeManageSessions', () => {
     const bp = { // dependency
       convo: {
@@ -114,20 +111,20 @@ describe('incoming middlewares', () => {
                                    'last_stamp', 'onyes')
     })
   })
-  describe('makeCheckYN', () => {
+  describe('makeCheckYes', () => {
     const SESSIONS = makeActiveMap(1)
-    const checkYN = makeCheckYN(SESSIONS)
-    SESSIONS.set('xyz', {
-      convo: { stop: () => {} }, // stop() must be implemented
-      last_stamp: 1504786753609, // .last_stamp must be a timestamp
-      onyes: 'replacement text'
-    })
+    const checkYes = makeCheckYes(SESSIONS)
     it('should return a function', () => {
-      checkYN.should.be.a('function')
+      checkYes.should.be.a('function')
     })
     it('should factor a function that resets e.text when asserting', () => {
-      const e = checkYN({ text: 'yes', user: { id: 'xyz' } }, () => {})
-      e.text.should.equal('replacement text')
+      SESSIONS.set('xyz', {
+        convo: { stop: () => {} }, // stop() must be implemented
+        last_stamp: 1504786753609, // .last_stamp must be a timestamp
+        onyes: 'replacement text'
+      })
+      checkYes({ text: 'yes', user: { id: 'xyz' } }, () => {}).text
+        .should.equal('replacement text')
     })
   })
   describe('tokenizeText', () => {
@@ -224,12 +221,24 @@ describe('incoming middlewares', () => {
     it('should return a function', () => {
       chooseResponse.should.be.a('function')
     })
-    it('should have more tests...', () => {
-      null.should.have.more.tests
+    it('should set session.onyes if there is an approx match', () => {
+      SESSIONS.set('xyz', {
+        convo: { stop: () => {}, say: (a, b) => {} }, // must be implemented
+        last_stamp: 1504786753609, // .last_stamp must be a timestamp
+        onyes: ''
+      })
+      chooseResponse({
+        text: 'features galaxy',
+        user: { id: 'xyz' },
+        stash: {
+          exactProducts: [],
+          approxProducts: { galaxy: 'Galaxy S9'},
+          exactCategories: [],
+          approxCategories: {},
+          hitProducts: {},
+        }
+      }, () => {})
+      SESSIONS.get('xyz').onyes.should.equal('features Galaxy S9')
     })
   })
-})
-
-describe('outgoing middlewares', () => {
-
 })
