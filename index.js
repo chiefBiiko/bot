@@ -1,33 +1,35 @@
 'use strict'
 
+// mobile view: http://localhost:3000/lite/?m=platform-webchat&v=fullscreen
+
 const SESSIONS = require('./helpers/makeActiveMap')(10)
 
 module.exports = bp => {
 
   // registering middlewares
   bp.middlewares.register({
-    name: 'tokenizeText', // friendly name
-    type: 'incoming', // either incoming or outgoing
-    order: 1, // arbitrary number
-    handler: require('./middlewares/tokenizeText') // the middleware f
+    name: 'tokenizeText',
+    type: 'incoming',
+    order: 1,
+    handler: require('./middlewares/tokenizeText')
   })
   bp.middlewares.register({
     name: 'manageSessions',
-    type: 'incoming',
+    type: 'incoming', // either incoming or outgoing
     order: 2,
     handler: require('./middlewares/makeManageSessions')(bp, SESSIONS)
   })
   bp.middlewares.register({
-    name: 'maybeRepeat',
+    name: 'rageScorer',
     type: 'incoming',
     order: 3,
-    handler: require('./middlewares/makeMaybeRepeat')(SESSIONS)
+    handler: require('./middlewares/makeRageScorer')(SESSIONS)
   })
   bp.middlewares.register({
     name: 'checkAgainstDB',
     type: 'incoming',
     order: 4,
-    handler: require('./middlewares/makeCheckAgainstDB')(bp, 1)
+    handler: require('./middlewares/makeCheckAgainstDB')(bp, 10)
   })
   bp.middlewares.register({
     name: 'flag',
@@ -52,12 +54,6 @@ module.exports = bp => {
     type: 'incoming',
     order: 8,
     handler: require('./middlewares/makeChooseResponse')(SESSIONS)
-  })
-  bp.middlewares.register({
-    name: 'storeOutgoing',
-    type: 'outgoing',
-    order: 9,
-    handler: require('./middlewares/makeStoreOutgoing')(SESSIONS)
   })
 
   // reloading middlewares

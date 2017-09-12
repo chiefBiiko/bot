@@ -1,16 +1,25 @@
 'use strict'
 
+const fs = require('fs')
+const path = require('path')
 const matchExAx = require('./../helpers/matchExAx')
 
-module.exports = (bp, minutes) => {
+const FAKE_DB = path.join(__dirname, '..', 'data', 'dev', 'products.json')
+
+module.exports = (jsonfile=FAKE_DB, minutes=10) => {
   var DB = {} // in-memory copy of products collection, updated repeatedly
   // initial fullfillment
-  bp.db.kvs.get('products').then(db => DB = db).catch(console.error)
+  fs.readFile(FAKE_DB, 'utf8', (err, data) => {
+    if (err) throw err
+    DB = JSON.parse(data)
+  })
   // schedule update
   setInterval(() => { // updating DB every minutes
     console.log(`updating DB @ ${new Date().toUTCString()}...`)
-    bp.db.kvs.get('products').then(db => DB = db).catch(console.error)
-  //console.log(DB)
+    fs.readFile(FAKE_DB, 'utf8', (err, data) => {
+      if (err) throw err
+      DB = JSON.parse(data)
+    })
   }, 1000 * 60 * minutes)
   // assemble factory return
   const checkAgainstDB = (e, next) => { // closes over DB

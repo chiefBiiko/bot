@@ -20,13 +20,13 @@ module.exports = (e, next) => {
             case 'ratings':
               return `got ${e.stash.hitProducts[pname].ratings.length} ratings`
             case 'wantsMinRating':
-              return `has a minimum rating of ` +
+              return `has a minimum rating score of ` +
                 `${Math.min(...e.stash.hitProducts[pname].ratings)}`
             case 'wantsMaxRating':
-              return `has a maximum rating of ` +
+              return `has a maximum rating score of ` +
                 `${Math.max(...e.stash.hitProducts[pname].ratings)}`
             case 'wantsAvgRating':
-              return `has an average rating of ` +
+              return `has an average rating score of ` +
                 `${e.stash.hitProducts[pname].ratings.reduce((a, c) => a + c) /
                   e.stash.hitProducts[pname].ratings.length}`
             default:

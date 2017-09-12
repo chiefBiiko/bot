@@ -6,18 +6,18 @@ const should = chai.should()
 const andFmtArr = require('./../helpers/andFmtArr')
 const toTitleCase = require('./../helpers/toTitleCase')
 const checkForUserName = require('./../helpers/checkForUserName')
-const replaceOrNull = require('./../helpers/replaceOrNull')
+const replaceOrFalsy = require('./../helpers/replaceOrFalsy')
 const matchExAx = require('./../helpers/matchExAx')
 const makeActiveMap = require('./../helpers/makeActiveMap')
 
-const tokenizeText = require('./../middlewares/tokenizeText')
+const makeCheckYN = require('./../middlewares/makeCheckYN')
 const makeManageSessions = require('./../middlewares/makeManageSessions')
-const makeMaybeRepeat = require('./../middlewares/makeMaybeRepeat')
+const tokenizeText = require('./../middlewares/tokenizeText')
+const makeRageScorer = require('./../middlewares/makeRageScorer')
+const makeCheckAgainstDB = require('./../middlewares/makeCheckAgainstDB')
 const flag = require('./../middlewares/flag')
 const patchProductInfo = require('./../middlewares/patchProductInfo')
 const makeChooseResponse = require('./../middlewares/makeChooseResponse')
-
-const makeStoreOutgoing = require('./../middlewares/makeStoreOutgoing')
 
 describe('helpers', () => {
   describe('andFmtArr', () => {
@@ -39,6 +39,9 @@ describe('helpers', () => {
     it('should handle the jim-bob -> Jim-Bob problem', () => {
       toTitleCase('jim-bob').should.equal('Jim-Bob')
     })
+    it('should allow empty strings', () => {
+      toTitleCase('').should.equal('')
+    })
   })
   describe('checkForUserName', () => {
     it('should extract a name from a "i am..." statement', () => {
@@ -51,12 +54,12 @@ describe('helpers', () => {
       checkForUserName('my number one food is pizza').should.equal('')
     })
   })
-  describe('replaceOrNull', () => {
+  describe('replaceOrFalsy', () => {
     it('should return a string in case of a replacement', () => {
-      replaceOrNull('abc', /[ci]/, 'z').should.equal('abz')
+      replaceOrFalsy('abc', /[ci]/, 'z').should.equal('abz')
     })
-    it('should return null in case of no replacement', () => {
-      should.equal(replaceOrNull('abc', 'y', 'z'), null)
+    it('should return an empty string in case of no replacement', () => {
+      replaceOrFalsy('abc', 'y', 'z').should.equal('')
     })
   })
   describe('matchExAx', () => {
@@ -67,9 +70,11 @@ describe('helpers', () => {
       x.should.be.an('object')
       x.should.have.all.keys('exact', 'approx')
     })
-    it('should return an object that has arrays as values', () => {
+    it('should return an object that has an array on .exact', () => {
       x.exact.should.be.an('array')
-      x.approx.should.be.an('array')
+    })
+    it('should return an object that has an object on .approx', () => {
+      x.approx.should.be.an('object')
     })
   })
   describe('makeActiveMap', () => {
@@ -88,6 +93,43 @@ describe('helpers', () => {
 })
 
 describe('incoming middlewares', () => {
+  describe('makeManageSessions', () => {
+    const bp = { // dependency
+      convo: {
+        start: (a, b) => {
+          return { say: () => {}, repeat: () => {} }
+        }
+      }
+    }
+    const SESSIONS = makeActiveMap(1) // dependency
+    const manageSessions = makeManageSessions(bp, SESSIONS)
+    it('should return a function', () => {
+      manageSessions.should.be.a('function')
+    })
+    it('should return a function that manages SESSIONS\'s members', () => {
+      manageSessions({ text: 'Hi Ho', user: { id: 'xyz' } }, () => {})
+      const session = SESSIONS.get('xyz')
+      session.should.be.an('object')
+      session.should.have.all.keys('convo', 'first_name', 'last_query',
+                                   'last_stamp', 'onyes')
+    })
+  })
+  describe('makeCheckYN', () => {
+    const SESSIONS = makeActiveMap(1)
+    const checkYN = makeCheckYN(SESSIONS)
+    SESSIONS.set('xyz', {
+      convo: { stop: () => {} }, // stop() must be implemented
+      last_stamp: 1504786753609, // .last_stamp must be a timestamp
+      onyes: 'replacement text'
+    })
+    it('should return a function', () => {
+      checkYN.should.be.a('function')
+    })
+    it('should factor a function that resets e.text when asserting', () => {
+      const e = checkYN({ text: 'yes', user: { id: 'xyz' } }, () => {})
+      e.text.should.equal('replacement text')
+    })
+  })
   describe('tokenizeText', () => {
     const e = tokenizeText({ text: 'Hi Ho' }, () => {})
     it('should return an object (e)', () => {
@@ -97,40 +139,29 @@ describe('incoming middlewares', () => {
       e.tokens.should.be.an('array')
     })
   })
-  describe('makeManageSessions', () => {
-    const bp = { // dependency
-      convo: {
-        start: (a, b) => {
-          return { say: () => {}, repeat: () => {} }
-        }
-      }
-    }
-    const activeMap = makeActiveMap(1) // dependency
-    const manageSessions = makeManageSessions(bp, activeMap)
-    it('should return a function', () => {
-      manageSessions.should.be.a('function')
-    })
-    it('should return a function that manages activeMap\'s members', () => {
-      manageSessions({ text: 'Hi Ho', user: { id: 'xyz' } }, () => {})
-      const session = activeMap.get('xyz')
-      session.should.be.an('object')
-      session.should.have.all.keys('convo', 'first_name', 'last_query',
-                                   'last_stamp')
-    })
-  })
-  describe('makeMaybeRepeat', () => {
+  describe('makeRageScorer', () => {
     const SESSIONS = makeActiveMap(1) // dependency
-    const maybeRepeat = makeMaybeRepeat(SESSIONS)
+    const rageScorer = makeRageScorer(SESSIONS)
     it('should return a function', () => {
-      maybeRepeat.should.be.a('function')
-    })
-    it('should have more tests...', () => {
-      null.should.have.more.tests
+      rageScorer.should.be.a('function')
     })
   })
   describe('makeCheckAgainstDB', () => {
-    it('should be tested...', () => {
-      null.should.be.tested
+    const checkAgainstDB = makeCheckAgainstDB('../data/dev/products.json', 10)
+    const e = checkAgainstDB({
+      text: 'price of the iphone 7',
+      tokens: [ 'price', 'of', 'the', 'iphone', '7' ]
+    }, () => {})
+    it('should return a function', () => {
+      checkAgainstDB.should.be.a('function')
+    })
+    it('should factor a function that sets a object under e.stash', () => {
+      e.stash.should.be.an('object')
+    })
+    it('should set a set of data properties on e.stash', () => {
+      e.stash.should.have.all.keys('exactProducts', 'approxProducts',
+                                   'exactCategories', 'approxCategories',
+                                   'hitProducts')
     })
   })
   describe('flag', () => {
@@ -189,8 +220,9 @@ describe('incoming middlewares', () => {
   })
   describe('makeChooseResponse', () => {
     const SESSIONS = makeActiveMap(1) // dependency
+    const chooseResponse = makeChooseResponse(SESSIONS)
     it('should return a function', () => {
-      makeChooseResponse(SESSIONS).should.be.a('function')
+      chooseResponse.should.be.a('function')
     })
     it('should have more tests...', () => {
       null.should.have.more.tests
@@ -199,20 +231,5 @@ describe('incoming middlewares', () => {
 })
 
 describe('outgoing middlewares', () => {
-  describe('makeStoreOutgoing', () => {
-    const SESSIONS = makeActiveMap(1) // dependency
-    const storeOutgoing = makeStoreOutgoing(SESSIONS) // closure
-    it('should return a function', () => {
-      storeOutgoing.should.be.a('function')
-    })
-    it('should factor a function that sets a string property ' +
-       'session.convo.last_outgoing on each member of SESSIONS', () => {
-         SESSIONS.set('xyz', {
-           convo: { stop: () => {} }, // stop() must be implemented
-           last_stamp: 1504786753609 // .last_stamp must be a timestamp
-         })
-         storeOutgoing({ text: 'last-sent msg', user: { id: 'xyz' } }, () => {})
-         SESSIONS.get('xyz').last_outgoing.should.be.a('string')
-       })
-  })
+
 })

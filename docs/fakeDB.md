@@ -1,9 +1,12 @@
 # fake DB for developing bot
 
-below has been set as a database mini sample; for initial development only:
+below has been set as a database mini sample
+
+@ `../data/dev/products.json`
+
+for initial development only:
 
 ```js
-// 4 dev: bp.db.kvs has a products object which looks like this
 {
   'Galaxy S9': {
     category: 'smartphones',

@@ -5,9 +5,10 @@
   "main": "index.js",
   "dependencies": {
     "botpress": "^1.0.28",
+    "botpress-platform-webchat": "^0.1.2",
     "botpress-web": "^1.2.3",
-    "compromise": "^10.7.2",
-    "natural": "^0.5.4"
+    "natural": "^0.5.4",
+    "sentiment": "^4.0.1"
   },
   "scripts": {
     "start": "botpress start",
@@ -17,7 +18,6 @@
   "license": "Botpress Proprietary License",
   "devDependencies": {
     "chai": "^4.1.2",
-    "chai-as-promised": "^7.1.1",
     "mocha": "^3.5.0"
   }
 }

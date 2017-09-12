@@ -1,19 +1,18 @@
 welcome:
   - typing: true
     text: # Picks one randomly
-      - Hey there {{first_name}}
+      - Hey {{first_name}}
       - Hello {{first_name}}
-  - text: I can provide info on product categories, specific products, their
-          features, pricing, and ratings, and can even show you product pics
-    typing: 2s
+  - text: I provide info on tech products, their features, prices, and ratings
 
 welcome-again:
-  - text: Hey we have already met {{first_name}}
+    text: Hey we have already met {{first_name}}
 
 nice2meet:
-  - text: Nice to meet you {{first_name}}
+    text: Nice to meet you {{first_name}}
 
 hit-product:
+  - typing: 250ms
     text:
       - Bingo! {{patch}}
       - Here you go. {{patch}}
@@ -36,8 +35,17 @@ fallback:
     text:
       - Sorry, I did not understand that
       - Hm, not sure what you mean
-      - what?
+
 
 repeat:
     text:
       - ...{{last_outgoing}}
+
+human-support:
+    text:
+      - You sound angry. Would you like to get human support via phone?
+
+bye:
+    text:
+      - Bye. It was nice talking to you {{first_name}}
+      - See you
