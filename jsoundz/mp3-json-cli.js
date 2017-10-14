@@ -5,7 +5,7 @@ function CLImp32JSON(mp3file) {
   try {
     console.log(buffer2JSON(fs.readFileSync(mp3file)))
   } catch (err) {
-    console.error(err);
+    console.error(err)
   }
 }
 
