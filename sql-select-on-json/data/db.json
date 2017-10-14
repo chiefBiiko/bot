@@ -1,0 +1,14 @@
+{
+  "inventory": [
+    { "gma_id": 1, "equipment1": 4, "equipment2": 5 },
+    { "gma_id": 2, "equipment1": 2, "equipment2": 1 }
+  ],
+  "volumes": [
+    { "gma_id": 1, "toner1": 14, "toner2": 15 },
+    { "gma_id": 2, "toner1": 4, "toner2": 2 }
+  ],
+  "invoices": [
+    { "gma_id": 1, "settled": 140, "pending": 150 },
+    { "gma_id": 2, "settled": 40, "pending": 20 }
+  ]
+}
