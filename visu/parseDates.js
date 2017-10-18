@@ -4,33 +4,31 @@ const chrono = require('chrono-node')
 
 const zeroPadToTwoDigitString = d => d < 10 && d >= 0 ? `0${d}` : `${d}`
 
-const nextDate = timestamp => {
-  var dat = new Date(timestamp.valueOf())
+const nextDate = date => {
+  var dat = new Date(date.valueOf())
   dat.setDate(dat.getDate() + 1)
   return dat
+}
+
+const fmtDate = date => {
+  return `${date.getFullYear()}-${
+            zeroPadToTwoDigitString(date.getMonth() + 1)}-${
+            zeroPadToTwoDigitString(date.getDate())}`
 }
 
 const parseEmAll = text => {
   const days = []
   const re = chrono.parse(text)
-  var start_ts
+  var start
   if (re[0] instanceof Object && re[0].hasOwnProperty('start')) {
-    start_ts = new Date(re[0].start.date().getTime())
-    days.push(
-      `${start_ts.getFullYear()}-${
-         zeroPadToTwoDigitString(start_ts.getMonth() + 1)}-${
-         zeroPadToTwoDigitString(start_ts.getDate())}`
-    )
+    start = new Date(re[0].start.date().getTime())
+    days.push(fmtDate(start))
     if (re[0].hasOwnProperty('end')) {
       const end_ts = re[0].end.date().getTime()
-      let nextDay = nextDate(start_ts)
-      while (end_ts >= nextDay.getTime()) {
-        days.push(
-          `${nextDay.getFullYear()}-${
-             zeroPadToTwoDigitString(nextDay.getMonth() + 1)}-${
-             zeroPadToTwoDigitString(nextDay.getDate())}`
-        )
-        nextDay = nextDate(nextDay.getTime())
+      let stepDay = nextDate(start)
+      while (end_ts >= stepDay.getTime()) {
+        days.push(fmtDate(stepDay))
+        stepDay = nextDate(stepDay)
       }
     }
   }
