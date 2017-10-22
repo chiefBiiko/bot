@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+<script>
+  'use strict'
+  window.onload = () => {
+    const stdusr = document.createElement('input')
+    stdusr.history = []
+    stdusr.prompt = ''
+    function browseCommandHistory(arrow, history) {
+      var cron = (arrow === 'up') ? [ ...new Set(history) ].reverse() : [ ...new Set(history) ]
+      if (!stdusr.prompt) {  // stdusr.prompt is temp memory what cmd is on prompt
+        stdusr.value += stdusr.prompt = cron[0]
+      } else if (cron[cron.indexOf(stdusr.value) + 1]) {  // making sure cmd history item is defined at target index
+        stdusr.value = ''
+        stdusr.value += stdusr.prompt = cron[cron.indexOf(stdusr.prompt) + 1]
+      }
+      stdusr.setSelectionRange(stdusr.value.length, stdusr.value.length)
+    }
+    stdusr.onkeydown = e => {
+      if (e.keyCode === 13) {
+        stdusr.history.push(stdusr.value)
+        stdusr.value = ''
+      } else if (stdusr.selectionStart === stdusr.value.length && stdusr.history.length && e.keyCode === 38) {
+        e.preventDefault()
+        browseCommandHistory('up', stdusr.history)
+      } else if (stdusr.selectionStart === stdusr.value.length && stdusr.history.length && e.keyCode === 40) {
+        browseCommandHistory('down', stdusr.history)
+      } else if (stdusr.selectionStart === stdusr.value.length && stdusr.prompt && e.keyCode === 27) {
+        stdusr.value = stdusr.prompt = ''
+      }
+    }
+    document.body.appendChild(stdusr)
+  }
+</script>
+</head>
+<body></body>
+</html>
