@@ -1,0 +1,5 @@
+# pepper
+
+`Peppering` describes a technique that allows to assemble a function call incrementally, supplying arguments in any arbitrary order, by name. A `peppering function` returns a `peppering function` if there are remaining undefined parameter parameters to the `peppered function`. A `peppering function` returns the evaluated `peppered function` once all required parameters of the `peppered function` have been supplied. It is closely related to `autocurrying` but revolves around a `peppering function` that identifies parameter-argument bindings by name rather than by order. To that end, arguments to the `peppering function` are supplied in the form of an arguments object.
+
+This approach allows to supply a function's arguments incrementally and in an arbitrary order, not necessarily the parameter order of the function's signature. Useful for dynamically building function calls, fx from incremental user input.
