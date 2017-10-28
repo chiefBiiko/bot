@@ -1,5 +1,6 @@
 // func: Function any js function
-// params: string[] of the names of all required parameters in the same order as they // appear in func's signature!
+// params: string[] of the names of all required parameters in the same order as
+// they appear in func's signature!
 const pepperFactory = (func, paramNames, thisArg) => {
   const _argmap = paramNames.reduce((acc, cur) => {
     acc[cur] = { value: undefined, ready: false }
