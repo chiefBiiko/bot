@@ -37,7 +37,8 @@ const pepperFactory = (func, paramNames, searchDepth, overwrite, thisArg) => {
       return rtn
     }
   }
-  if (!searchDepth || !searchDepth.length) searchDepth = [ -1 ]
+  if (!Array.isArray(searchDepth) || !searchDepth.length) searchDepth = [ -1 ]
+  if (![ true, false ].includes(overwrite)) overwrite = false
   _args.map = _args.default()
   return pepper
 }

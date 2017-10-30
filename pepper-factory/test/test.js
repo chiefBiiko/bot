@@ -11,7 +11,7 @@ describe('pepperFactory', () => {
 
 describe('pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
-  const pepper = pepperFactory(stringify, [ 'a', 'b' ])
+  const pepper = pepperFactory(stringify, [ 'a', 'b' ], [ 0 ], false, null)
   it('should autocurry', () => {
     should.equal(pepper({ a: 1 }), undefined)
     pepper({ b: 2 }).should.equal('a:1, b:2')
@@ -34,7 +34,7 @@ describe('pepper', () => {
 
 describe('fuzzy pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
-  const fuzzyPepper = pepperFactory(stringify, [ 'a', 'b' ], [ -1 ], null)
+  const fuzzyPepper = pepperFactory(stringify, [ 'a', 'b' ], [ -1 ], false, null)
   it('should take values as indicated in searchDepth, fx anywhere', () => {
     should.equal(fuzzyPepper({ z: { y: { b: 5 } } }), undefined)
     fuzzyPepper({ z: { a: 6 } }).should.equal('a:6, b:5')
@@ -43,7 +43,7 @@ describe('fuzzy pepper', () => {
 
 describe('sharp pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
-  const sharpPepper = pepperFactory(stringify, [ 'a', 'b' ], [ 1, 2 ], null)  
+  const sharpPepper = pepperFactory(stringify, [ 'a', 'b' ], [ 1, 2 ], false, null)  
   it('should only search at depths that are indicated', () => {
     should.equal(sharpPepper({ a: { y: { z: 7 } } }), undefined)
     should.equal(sharpPepper({ b: { x: 8 }, c: [] }), undefined)
