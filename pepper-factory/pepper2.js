@@ -15,20 +15,19 @@ const pepperFactory = (func, paramNames, searchDepth, overwrite, thisArg) => {
     if (!searchDepth.includes(-1) && n > Math.max(...searchDepth)) return
     Object.keys(x)
       .map(key => [ key, x[key] ])
-      .forEach(([ key, val ]) => {
+      .map(([ key, val ]) => {
         if (searchDepth.includes(-1) || searchDepth.includes(n)) {
           _args.maybeStash([ [ key, val ] ])
         }
-        _walkAndMaybeStash(val, ++n)
-      }) 
+        return val
+      })
+      .filter(val => val !== null && val.__proto__ === Object.prototype)
+      .forEach(obj => _walkAndMaybeStash(obj, ++n))
   }
   const pepper = argmap => {
-    if (!argmap) return
-    if (!searchDepth || searchDepth === [ 0 ]) {
-      _args.maybeStash(Object.keys(argmap).map(key => [ key, argmap[key] ]))
-    } else if (Array.isArray(searchDepth)) {
-      _walkAndMaybeStash(argmap, 0)  
-    }
+    if (!argmap || argmap.__proto__ !== Object.prototype) return
+    _walkAndMaybeStash(argmap, 0)
+  //console.log(_args.map)
     if (Object.keys(_args.map).every(key => _args.map[key].ready)) {
       const rtn = 
         func.apply(thisArg, 
@@ -37,7 +36,7 @@ const pepperFactory = (func, paramNames, searchDepth, overwrite, thisArg) => {
       return rtn
     }
   }
-  if (!Array.isArray(searchDepth) || !searchDepth.length) searchDepth = [ -1 ]
+  if (!Array.isArray(searchDepth) || !searchDepth.length) searchDepth = [ 0 ]
   if (![ true, false ].includes(overwrite)) overwrite = false
   _args.map = _args.default()
   return pepper

@@ -15,6 +15,8 @@ describe('pepper', () => {
   it('should autocurry', () => {
     should.equal(pepper({ a: 1 }), undefined)
     pepper({ b: 2 }).should.equal('a:1, b:2')
+    // eval and clear!!!
+    pepper({ a: 11, b: 22 }).should.equal('a:11, b:22')
   })
   it('should numb on "wrong" input', () => {
     should.equal(pepper([]), undefined)
@@ -24,12 +26,28 @@ describe('pepper', () => {
     should.equal(pepper({ b: 0 }), undefined)
     pepper({ a: 1 }).should.equal('a:1, b:0')
   })
+})
+
+describe('pepper (clear)', () => {
+  const stringify = (a, b) => `a:${a}, b:${b}`
+  const pepper = pepperFactory(stringify, [ 'a', 'b' ], [ 0 ], false, null)
   it('should clear its arguments after every evaluation', () => {
     should.equal(pepper({ a: 1 }), undefined)
     pepper({ b: 2 }).should.equal('a:1, b:2')
     should.equal(pepper({ b: 3 }), undefined)
     pepper({ a: 4 }).should.equal('a:4, b:3')
   })
+  it('should have a clear method, to be invoked manually', () => {
+    pepper.clear.should.be.a('function')
+  })
+  it('should have an overloaded .clear method', () => {
+    should.equal(pepper({ a: 33 }), undefined)
+    pepper.clear()
+    should.equal(pepper({ b: 44 }), undefined)
+    pepper.clear([ 'b' ])
+    should.equal(pepper({ a: 33 }), undefined)
+    pepper({ b: 44 }).should.equal('a:33, b:44')
+   })
 })
 
 describe('fuzzy pepper', () => {
