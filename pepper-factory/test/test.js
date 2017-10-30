@@ -1,17 +1,55 @@
 const should = require('chai').should()
 
-const pepperFactory = require('./../index')
+const pepperFactory = require('./../pepper2')
 
 describe('pepperFactory', () => {
   const noop = () => {}
-  const binaryAdd = (a, b) => a + b
   it('should return a function', () => {
     pepperFactory(noop, []).should.be.a('function')
-  })
-  it('should return a function that is evaluated once all parameters ' +
-     'have been supplied', () => {
-    const pepper = pepperFactory(binaryAdd, [ 'a', 'b' ])
+  })  
+})
+
+describe('pepper', () => {
+  const stringify = (a, b) => `a:${a}, b:${b}`
+  const pepper = pepperFactory(stringify, [ 'a', 'b' ])
+  it('should autocurry', () => {
     should.equal(pepper({ a: 1 }), undefined)
-    pepper({ b: 2 }).should.equal(3)
+    pepper({ b: 2 }).should.equal('a:1, b:2')
+  })
+  it('should numb on "wrong" input', () => {
+    should.equal(pepper([]), undefined)
+    should.equal(pepper({}), undefined)
+    should.equal(pepper(36), undefined)
+    should.equal(pepper(null), undefined)
+    should.equal(pepper({ b: 0 }), undefined)
+    pepper({ a: 1 }).should.equal('a:1, b:0')
+  })
+  it('should clear its arguments after every evaluation', () => {
+    should.equal(pepper({ a: 1 }), undefined)
+    pepper({ b: 2 }).should.equal('a:1, b:2')
+    should.equal(pepper({ b: 3 }), undefined)
+    pepper({ a: 4 }).should.equal('a:4, b:3')
+  })
+})
+
+describe('fuzzy pepper', () => {
+  const stringify = (a, b) => `a:${a}, b:${b}`
+  const fuzzyPepper = pepperFactory(stringify, [ 'a', 'b' ], [ -1 ], null)
+  it('should take values as indicated in searchDepth, fx anywhere', () => {
+    should.equal(fuzzyPepper({ z: { y: { b: 5 } } }), undefined)
+    fuzzyPepper({ z: { a: 6 } }).should.equal('a:6, b:5')
+  })
+})
+
+describe('sharp pepper', () => {
+  const stringify = (a, b) => `a:${a}, b:${b}`
+  const sharpPepper = pepperFactory(stringify, [ 'a', 'b' ], [ 1, 2 ], null)  
+  it('should only search at depths that are indicated', () => {
+    should.equal(sharpPepper({ a: { y: { z: 7 } } }), undefined)
+    should.equal(sharpPepper({ b: { x: 8 }, c: [] }), undefined)
+    should.equal(sharpPepper({ a: 9 }), undefined)
+    should.equal(sharpPepper({ b: 10, c: false }), undefined)
+    should.equal(sharpPepper({ x: { y: { b: 11 } } }), undefined)
+    sharpPepper({ y: { a: 12 } }).should.equal('a:12, b:11')
   })
 })
