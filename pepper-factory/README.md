@@ -10,22 +10,69 @@ This approach allows to supply a function's arguments incrementally and in an ar
 
 ## Usage
 
-...
+*Pepper* a function by passing it to the `pepperFactory` alongside an array that lists its parameter names in the same order as they appear in the function's signature. 
 
 ```js
 const pepperFactory = require('pepper-factory')
 const stringify = (a, b, c) => `a:${a}, b:${b}, c:${c}`
-
-// 2nd argument to pepperFactory must be a string[] listing the parameter
-// names of the function getting peppered in the same order as they appear
-// in its signature
 const pepper = pepperFactory(stringify, [ 'a', 'b', 'c' ])
 
-// peppering stringify
 pepper({ c: 77 }) // -> undefined
 pepper({ a: 36 }) // -> undefined
 pepper({ b: 44 }) // -> 'a:36, b:44, c:77'
 ```
+
+***
+
+## API
+
+### `const pepper = pepperFactory(func, paramNames, opts)`
+
+*Pepper* a function.
+
++ `func` Function **required**
++ `paramNames` string[] **required**
++ `opts` Object **optional**
+
+`opts` defaults to:
+
+```js
+{
+  // opts.levels: number[]
+  // match obj.keys at these (nested) levels, [ -1 ] indicates anywhere
+  levels: [ 0 ],
+  // opts.overwrite: boolean
+  // overwrite previously stored argument matches?
+  overwrite: false,
+  // clearEvery: number
+  // clear stored argument matches after every N calls, -1 indicates never
+  clearEvery: -1,
+  // thisArg: any
+  // this when evaluating func
+  thisArg: null
+}
+```
+**Return** Function
+
+### `pepper.clear([string[]])`
+
+Manually clear stored arguments.
+
+If called with an array of keys to clear, only the indicated argument values are cleared, otherwise all.
+
+**Return** undefined
+
+### `pepper.getArgMap()`
+
+Get the internal arguments object.
+
+**Return** Object
+
+### `pepper.getConfig()`
+
+Get an configurations object that includes all defined and default arguments to `pepperFactory`.
+
+**Return** Object
 
 ***
 

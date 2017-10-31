@@ -11,7 +11,7 @@ describe('pepperFactory', () => {
 
 describe('pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
-  const pepper = pepperFactory(stringify, [ 'a', 'b' ], [ 0 ], false, -1, null)
+  const pepper = pepperFactory(stringify, [ 'a', 'b' ])
   it('should autocurry', () => {
     should.equal(pepper({ a: 1 }), undefined)
     pepper({ b: 2 }).should.equal('a:1, b:2')
@@ -30,7 +30,7 @@ describe('pepper', () => {
 
 describe('pepper (clear)', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
-  const pepper = pepperFactory(stringify, [ 'a', 'b' ], [ 0 ], false, -1, null)
+  const pepper = pepperFactory(stringify, [ 'a', 'b' ])
   it('should clear its arguments after every evaluation', () => {
     should.equal(pepper({ a: 1 }), undefined)
     pepper({ b: 2 }).should.equal('a:1, b:2')
@@ -52,14 +52,16 @@ describe('pepper (clear)', () => {
 
 describe('pepper (overwrite)', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
-  const lockPepper = pepperFactory(stringify, [ 'a', 'b' ], [ 0 ], false, -1, null)
-  const freePepper = pepperFactory(stringify, [ 'a', 'b' ], [ 0 ], true, -1, null)
-  it('should not allow overwriting if overwrite !== true', () => {
+  const lockPepper = 
+    pepperFactory(stringify, [ 'a', 'b' ], { overwrite: false })
+  const freePepper = 
+    pepperFactory(stringify, [ 'a', 'b' ], { overwrite: true })
+  it('should not allow overwriting if opts.overwrite !== true', () => {
     should.equal(lockPepper({ a: 77 }), undefined)
     should.equal(lockPepper({ a: 88 }), undefined)
     lockPepper({ b: 99 }).should.equal('a:77, b:99')
   })
-  it('should allow overwriting if overwrite === true', () => {
+  it('should allow overwriting if opts.overwrite === true', () => {
     should.equal(freePepper({ a: 77 }), undefined)
     should.equal(freePepper({ a: 88 }), undefined)
     freePepper({ b: 99 }).should.equal('a:88, b:99')
@@ -68,7 +70,7 @@ describe('pepper (overwrite)', () => {
 
 describe('pepper (getters)', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
-  const pepper = pepperFactory(stringify, [ 'a', 'b' ], [ 0 ], false, -1, null)
+  const pepper = pepperFactory(stringify, [ 'a', 'b' ])
   it('should have getters getArgMap and getConfig', () => {
     pepper.getArgMap.should.be.a('function')
     pepper.getConfig.should.be.a('function')
@@ -79,18 +81,16 @@ describe('pepper (getters)', () => {
   it('should have getConfig that returns an object with keys...', () => {
     const config = pepper.getConfig()
     config.should.be.an('object')
-    config.should.have.all.keys('func', 
-                                'paramNames', 
-                                'searchDepth', 
-                                'overwrite', 
-                                'clearAfter',
-                                'thisArg')
+    config.should.have.all.keys('func', 'paramNames', 'opts')
+    config.opts
+      .should.have.all.keys('levels', 'overwrite', 'clearEvery', 'thisArg')
   })
 })
 
 describe('fuzzy pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
-  const fuzzyPepper = pepperFactory(stringify, [ 'a', 'b' ], [ -1 ], false, -1, null)
+  const fuzzyPepper = 
+    pepperFactory(stringify, [ 'a', 'b' ], { levels: [ -1 ] })
   it('should take values as indicated in searchDepth, fx anywhere', () => {
     should.equal(fuzzyPepper({ z: { y: { b: 5 } } }), undefined)
     fuzzyPepper({ z: { a: 6 } }).should.equal('a:6, b:5')
@@ -99,7 +99,8 @@ describe('fuzzy pepper', () => {
 
 describe('sharp pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
-  const sharpPepper = pepperFactory(stringify, [ 'a', 'b' ], [ 1, 2 ], false, -1, null)  
+  const sharpPepper = 
+    pepperFactory(stringify, [ 'a', 'b' ], { levels: [ 1, 2 ] })  
   it('should only search at depths that are indicated', () => {
     should.equal(sharpPepper({ a: { y: { z: 7 } } }), undefined)
     should.equal(sharpPepper({ b: { x: 8 }, c: [] }), undefined)

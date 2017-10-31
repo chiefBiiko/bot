@@ -1,5 +1,4 @@
-const pepperFactory =
-  (func, paramNames, searchDepth, overwrite, clearAfter, thisArg) => {
+const pepperFactory = (func, paramNames, opts) => {
   const _args = { 
     map : {},
     default: () => paramNames.reduce((acc, cur) => {
@@ -8,32 +7,35 @@ const pepperFactory =
     }, {})
   }
   const _walkAndMaybeStash = (x, n) => {
-    if (!searchDepth.includes(-1) && n > Math.max(...searchDepth)) return
+    if (!opts.levels.includes(-1) && n > Math.max(...opts.levels)) return
     Object.keys(x)
       .map(key => [ key, x[key] ])
       .map(([ key, val ]) => {
-        if ((searchDepth.includes(-1) || searchDepth.includes(n)) &&
+        if ((opts.levels.includes(-1) || opts.levels.includes(n)) &&
             _args.map.hasOwnProperty(key) && 
-            (overwrite || !_args.map[key].ready)) {
+            (opts.overwrite || !_args.map[key].ready)) {
           _args.map[key] = { value: val, ready: true }
         }
         return val
       })
-      .filter(val => val !== null && val.__proto__ === Object.prototype)
-      .forEach(obj => _walkAndMaybeStash(obj, ++n))
+      .filter(isObject)
+      .forEach(obj => _walkAndMaybeStash(obj, n + 1))
   }
+  const isNumber = x => typeof x === 'number' || x instanceof Number
+  const isObject = x => 
+    x !== null && x !== undefined && x.__proto__ === Object.prototype
   var _input_countr = 0
   const pepper = argmap => {
-    if (!argmap || argmap.__proto__ !== Object.prototype) return
+    if (!isObject(argmap)) return
     _walkAndMaybeStash(argmap, 0)
     if (Object.keys(_args.map).every(key => _args.map[key].ready)) {
       const rtn = 
-        func.apply(thisArg, 
+        func.apply(opts.thisArg, 
                    Object.keys(_args.map).map(key => _args.map[key].value))
       _args.map = _args.default()
       _input_countr = 0
       return rtn
-    } else if (clearAfter !== -1 && ++_input_countr >= clearAfter) {
+    } else if (opts.clearEvery !== -1 && ++_input_countr >= opts.clearEvery) {
       _args.map = _args.default()
       _input_countr = 0
     }
@@ -50,20 +52,16 @@ const pepperFactory =
     }
   }
   pepper.getArgMap = () => _args.map
-  pepper.getConfig = () => { 
-    return { 
-      func: func, 
-      paramNames: paramNames,
-      searchDepth: searchDepth,
-      overwrite: overwrite,
-      clearAfter: clearAfter,
-      thisArg: thisArg 
-    }
-  }
-  if (!Array.isArray(searchDepth) || !searchDepth.length) searchDepth = [ 0 ]
-  if (![ true, false ].includes(overwrite)) overwrite = false
-  if (typeof clearAfter !== 'number' && !clearAfter instanceof Number)
-    clearAfter = -1
+  pepper.getConfig = () => ({ func: func, paramNames: paramNames, opts: opts })
+  if (!isObject(opts)) opts = {}
+  if (!opts.thisArg) opts.thisArg = null 
+  if (![ true, false ].includes(opts.overwrite)) opts.overwrite = false
+  if (!Array.isArray(opts.levels) || 
+      !opts.levels.length || 
+      !opts.levels.every(isNumber))
+    opts.levels = [ 0 ]
+  opts.clearEvery = isNumber(opts.clearEvery) ? 
+    Math.floor(opts.clearEvery) : -1
   _args.map = _args.default()
   return pepper
 }
