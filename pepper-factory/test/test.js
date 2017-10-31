@@ -1,6 +1,6 @@
 const should = require('chai').should()
 
-const pepperFactory = require('./../pepper3')
+const pepperFactory = require('./../index')
 
 describe('pepperFactory', () => {
   const noop = () => {}
@@ -40,7 +40,7 @@ describe('pepper (clear)', () => {
   it('should have a clear method, to be invoked manually', () => {
     pepper.clear.should.be.a('function')
   })
-  it('should have an overloaded .clear method', () => {
+  it('should have an overloaded clear method', () => {
     should.equal(pepper({ a: 33 }), undefined)
     pepper.clear()
     should.equal(pepper({ b: 44 }), undefined)
