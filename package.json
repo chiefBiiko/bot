@@ -6,6 +6,9 @@
   "keywords": [],
   "author": "Noah Anabiik Schwarz",
   "license": "MIT",
+  "engines" : {
+    "node" : ">=6.00"
+  },
   "scripts": {
     "test": "./node_modules/.bin/mocha"
   },

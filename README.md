@@ -1,4 +1,4 @@
-# pepper
+# pepper-factory
 
 [![build status](http://img.shields.io/travis/chiefBiiko/pepper-factory.svg?style=flat)](http://travis-ci.org/chiefBiiko/pepper-factory)
 
