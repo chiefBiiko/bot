@@ -1,244 +1,112 @@
-'use strict'
+const should = require('chai').should()
 
-const chai = require('chai')
-const should = chai.should()
+const pepperFactory = require('./../index')
 
-const andFmtArr = require('./../helpers/andFmtArr')
-const toTitleCase = require('./../helpers/toTitleCase')
-const checkForUserName = require('./../helpers/checkForUserName')
-const replaceOrFalsy = require('./../helpers/replaceOrFalsy')
-const matchExAx = require('./../helpers/matchExAx')
-const makeActiveMap = require('./../helpers/makeActiveMap')
+describe('pepperFactory', () => {
+  const noop = () => {}
+  it('should return a function', () => {
+    pepperFactory(noop, []).should.be.a('function')
+  })  
+})
 
-const makeCheckYes = require('./../middlewares/makeCheckYes')
-const makeManageSessions = require('./../middlewares/makeManageSessions')
-const tokenizeText = require('./../middlewares/tokenizeText')
-const makeRageScorer = require('./../middlewares/makeRageScorer')
-const makeCheckAgainstDB = require('./../middlewares/makeCheckAgainstDB')
-const flag = require('./../middlewares/flag')
-const patchProductInfo = require('./../middlewares/patchProductInfo')
-const makeChooseResponse = require('./../middlewares/makeChooseResponse')
-
-describe('helpers', () => {
-  describe('andFmtArr', () => {
-    it('should return a string', () => {
-      andFmtArr(['pizza', 'pasta', 'burgers']).should.be.a('string')
-    })
-    it('should format an array to a semantic sequence', () => {
-      andFmtArr(['a', 'b', 'c']).should.equal('a, b, and c')
-    })
-    it('should handle empty and length-one arrays', () => {
-      andFmtArr([]).should.equal('')
-      andFmtArr([1]).should.equal('1')
-    })
+describe('pepper', () => {
+  const stringify = (a, b) => `a:${a}, b:${b}`
+  const pepper = pepperFactory(stringify, [ 'a', 'b' ])
+  it('should autocurry', () => {
+    should.equal(pepper({ a: 1 }), undefined)
+    pepper({ b: 2 }).should.equal('a:1, b:2')
+    // eval and clear!!!
+    pepper({ a: 11, b: 22 }).should.equal('a:11, b:22')
   })
-  describe('toTitleCase', () => {
-    it('should uppercase the first letter of a string', () => {
-      toTitleCase('chief').should.equal('Chief')
-    })
-    it('should handle the jim-bob -> Jim-Bob problem', () => {
-      toTitleCase('jim-bob').should.equal('Jim-Bob')
-    })
-    it('should allow empty strings', () => {
-      toTitleCase('').should.equal('')
-    })
-  })
-  describe('checkForUserName', () => {
-    it('should extract a name from a "my name is..." statement', () => {
-      checkForUserName('wahala my name is kweku mensa').should.equal('Kweku')
-    })
-    it('should return an empty string if no name detected', () => {
-      checkForUserName('my number one food is pizza').should.equal('')
-    })
-  })
-  describe('replaceOrFalsy', () => {
-    it('should return a string in case of a replacement', () => {
-      replaceOrFalsy('abc', /[ci]/, 'z').should.equal('abz')
-    })
-    it('should return an empty string in case of no replacement', () => {
-      replaceOrFalsy('abc', 'y', 'z').should.equal('')
-    })
-  })
-  describe('matchExAx', () => {
-    const x = matchExAx('buy me an ipad pro',
-                        ['buy', 'me', 'an', 'ipad', 'pro'],
-                        ['iphone 7', 'ipad pro'])
-    it('should return an object with .exact and .approx', () => {
-      x.should.be.an('object')
-      x.should.have.all.keys('exact', 'approx')
-    })
-    it('should return an object that has an array on .exact', () => {
-      x.exact.should.be.an('array')
-    })
-    it('should return an object that has an object on .approx', () => {
-      x.approx.should.be.an('object')
-    })
-  })
-  describe('makeActiveMap', () => {
-    it('should return an ~auto-flush map', done => {
-      const SESSIONS = makeActiveMap(1)
-      SESSIONS.set('testsession', {
-        convo: { stop: () => {} }, // stop() must be implemented
-        last_stamp: 1504786753609 // .last_stamp must be a timestamp
-      })
-      setTimeout(() => {
-        SESSIONS.should.be.empty
-        done()
-      }, 1000 * 61)       // exec timeout
-    }).timeout(1000 * 63) // test timeout
+  it('should numb on "wrong" input', () => {
+    should.equal(pepper([]), undefined)
+    should.equal(pepper({}), undefined)
+    should.equal(pepper(36), undefined)
+    should.equal(pepper(null), undefined)
+    should.equal(pepper({ b: 0 }), undefined)
+    pepper({ a: 1 }).should.equal('a:1, b:0')
   })
 })
 
-describe('middlewares', () => {
-  describe('makeManageSessions', () => {
-    const bp = { // dependency
-      convo: {
-        start: (a, b) => {
-          return { say: () => {}, repeat: () => {} }
-        }
-      }
-    }
-    const SESSIONS = makeActiveMap(1) // dependency
-    const manageSessions = makeManageSessions(bp, SESSIONS)
-    it('should return a function', () => {
-      manageSessions.should.be.a('function')
-    })
-    it('should return a function that manages SESSIONS\'s members', () => {
-      manageSessions({ text: 'Hi Ho', user: { id: 'xyz' } }, () => {})
-      const session = SESSIONS.get('xyz')
-      session.should.be.an('object')
-      session.should.have.all.keys('convo', 'first_name', 'last_query',
-                                   'last_stamp', 'onyes')
-    })
+describe('pepper (clear)', () => {
+  const stringify = (a, b) => `a:${a}, b:${b}`
+  const pepper = pepperFactory(stringify, [ 'a', 'b' ])
+  it('should clear its arguments after every evaluation', () => {
+    should.equal(pepper({ a: 1 }), undefined)
+    pepper({ b: 2 }).should.equal('a:1, b:2')
+    should.equal(pepper({ b: 3 }), undefined)
+    pepper({ a: 4 }).should.equal('a:4, b:3')
   })
-  describe('makeCheckYes', () => {
-    const SESSIONS = makeActiveMap(1)
-    const checkYes = makeCheckYes(SESSIONS)
-    it('should return a function', () => {
-      checkYes.should.be.a('function')
-    })
-    it('should factor a function that resets e.text when asserting', () => {
-      SESSIONS.set('xyz', {
-        convo: { stop: () => {} }, // stop() must be implemented
-        last_stamp: 1504786753609, // .last_stamp must be a timestamp
-        onyes: 'replacement text'
-      })
-      checkYes({ text: 'yes', user: { id: 'xyz' } }, () => {}).text
-        .should.equal('replacement text')
-    })
+  it('should have a clear method, to be invoked manually', () => {
+    pepper.clear.should.be.a('function')
   })
-  describe('tokenizeText', () => {
-    const e = tokenizeText({ text: 'Hi Ho' }, () => {})
-    it('should return an object (e)', () => {
-      e.should.be.an('object')
-    })
-    it('should return e with an array for .tokens', () => {
-      e.tokens.should.be.an('array')
-    })
+  it('should have an overloaded clear method', () => {
+    should.equal(pepper({ a: 33 }), undefined)
+    pepper.clear()
+    should.equal(pepper({ b: 44 }), undefined)
+    pepper.clear([ 'b' ])
+    should.equal(pepper({ a: 55 }), undefined)
+    pepper({ b: 66 }).should.equal('a:55, b:66')
+   })
+})
+
+describe('pepper (overwrite)', () => {
+  const stringify = (a, b) => `a:${a}, b:${b}`
+  const lockPepper = 
+    pepperFactory(stringify, [ 'a', 'b' ], { overwrite: false })
+  const freePepper = 
+    pepperFactory(stringify, [ 'a', 'b' ], { overwrite: true })
+  it('should not allow overwriting if opts.overwrite !== true', () => {
+    should.equal(lockPepper({ a: 77 }), undefined)
+    should.equal(lockPepper({ a: 88 }), undefined)
+    lockPepper({ b: 99 }).should.equal('a:77, b:99')
   })
-  describe('makeRageScorer', () => {
-    const SESSIONS = makeActiveMap(1) // dependency
-    const rageScorer = makeRageScorer(SESSIONS)
-    it('should return a function', () => {
-      rageScorer.should.be.a('function')
-    })
+  it('should allow overwriting if opts.overwrite === true', () => {
+    should.equal(freePepper({ a: 77 }), undefined)
+    should.equal(freePepper({ a: 88 }), undefined)
+    freePepper({ b: 99 }).should.equal('a:88, b:99')
   })
-  describe('makeCheckAgainstDB', () => {
-    const checkAgainstDB = makeCheckAgainstDB('../data/dev/products.json', 10)
-    const e = checkAgainstDB({
-      text: 'price of the iphone 7',
-      tokens: [ 'price', 'of', 'the', 'iphone', '7' ]
-    }, () => {})
-    it('should return a function', () => {
-      checkAgainstDB.should.be.a('function')
-    })
-    it('should factor a function that sets a object under e.stash', () => {
-      e.stash.should.be.an('object')
-    })
-    it('should set a set of data properties on e.stash', () => {
-      e.stash.should.have.all.keys('exactProducts', 'approxProducts',
-                                   'exactCategories', 'approxCategories',
-                                   'hitProducts')
-    })
+})
+
+describe('pepper (getters)', () => {
+  const stringify = (a, b) => `a:${a}, b:${b}`
+  const pepper = pepperFactory(stringify, [ 'a', 'b' ])
+  it('should have getters getArgMap and getConfig', () => {
+    pepper.getArgMap.should.be.a('function')
+    pepper.getConfig.should.be.a('function')
   })
-  describe('flag', () => {
-    const e = flag({
-      text: 'tell me the price of the iphone 7',
-      stash: {
-        exactProducts: [ 'iphone 7' ],
-        hitProducts: {
-          'iphone 7' : {
-            category: 'smartphones',
-            features: [ 'hd-camera', 'siri' ],
-            pictures: [ 'iphront.png', 'iphback.png' ],
-            price: 900,
-            ratings: [ 4, 3, 5, 4, 3, 4, 3, 4, 1, 3 ],
-          }
-        }
-      }
-    },
-    () => {})
-    it('should set boolean flags as e.stash.hitProducts.*.flags.wants*', () => {
-      e.stash.hitProducts['iphone 7'].flags.should.be.an('object')
-      Object.keys(e.stash.hitProducts['iphone 7'].flags).forEach(flag => {
-        e.stash.hitProducts['iphone 7'].flags[flag].should.be.a('boolean')
-      })
-    })
+  it('should have getArgMap that returns an object', () => {
+    pepper.getArgMap().should.be.an('object')
   })
-  describe('patchProductInfo', () => {
-    const e = patchProductInfo({
-      text: 'tell me the price of the iphone 7',
-      stash: {
-        exactProducts: [ 'iphone 7' ],
-        hitProducts: {
-          'iphone 7' : {
-            category: 'smartphones',
-            features: [ 'hd-camera', 'siri' ],
-            pictures: [ 'iphront.png', 'iphback.png' ],
-            price: 900,
-            ratings: [ 4, 3, 5, 4, 3, 4, 3, 4, 1, 3 ],
-            flags: {
-               features: false,
-               pictures: false,
-               price: true,
-               ratings: false,
-               wantsMinRating: false,
-               wantsMaxRating: false,
-               wantsAvgRating: false
-            }
-          }
-        }
-      }
-    },
-    () => {})
-    it('should add a string under e.stash.hitProducts.*.patch', () => {
-      e.stash.hitProducts['iphone 7'].patch.should.be.a('string')
-    })
+  it('should have getConfig that returns an object with keys...', () => {
+    const config = pepper.getConfig()
+    config.should.be.an('object')
+    config.should.have.all.keys('func', 'paramNames', 'opts')
+    config.opts
+      .should.have.all.keys('levels', 'overwrite', 'clearEvery', 'thisArg')
   })
-  describe('makeChooseResponse', () => {
-    const SESSIONS = makeActiveMap(1) // dependency
-    const chooseResponse = makeChooseResponse(SESSIONS)
-    it('should return a function', () => {
-      chooseResponse.should.be.a('function')
-    })
-    it('should set session.onyes if there is an approx match', () => {
-      SESSIONS.set('xyz', {
-        convo: { stop: () => {}, say: (a, b) => {} }, // must be implemented
-        last_stamp: 1504786753609, // .last_stamp must be a timestamp
-        onyes: ''
-      })
-      chooseResponse({
-        text: 'features galaxy',
-        user: { id: 'xyz' },
-        stash: {
-          exactProducts: [],
-          approxProducts: { galaxy: 'Galaxy S9'},
-          exactCategories: [],
-          approxCategories: {},
-          hitProducts: {},
-        }
-      }, () => {})
-      SESSIONS.get('xyz').onyes.should.equal('features Galaxy S9')
-    })
+})
+
+describe('fuzzy pepper', () => {
+  const stringify = (a, b) => `a:${a}, b:${b}`
+  const fuzzyPepper = 
+    pepperFactory(stringify, [ 'a', 'b' ], { levels: [ -1 ] })
+  it('should take values as indicated in searchDepth, fx anywhere', () => {
+    should.equal(fuzzyPepper({ z: { y: { b: 5 } } }), undefined)
+    fuzzyPepper({ z: { a: 6 } }).should.equal('a:6, b:5')
+  })
+})
+
+describe('sharp pepper', () => {
+  const stringify = (a, b) => `a:${a}, b:${b}`
+  const sharpPepper = 
+    pepperFactory(stringify, [ 'a', 'b' ], { levels: [ 1, 2 ] })  
+  it('should only search at depths that are indicated', () => {
+    should.equal(sharpPepper({ a: { y: { z: 7 } } }), undefined)
+    should.equal(sharpPepper({ b: { x: 8 }, c: [] }), undefined)
+    should.equal(sharpPepper({ a: 9 }), undefined)
+    should.equal(sharpPepper({ b: 10, c: false }), undefined)
+    should.equal(sharpPepper({ x: { y: { b: 11 } } }), undefined)
+    sharpPepper({ y: { a: 12 } }).should.equal('a:12, b:11')
   })
 })

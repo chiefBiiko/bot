@@ -70,7 +70,7 @@ Get the internal arguments object.
 
 ### `pepper.getConfig()`
 
-Get an configurations object that includes all defined and default arguments to `pepperFactory`.
+Get an configurations object that includes all defined and defaulted arguments of `pepperFactory`.
 
 **Return** Object
 
