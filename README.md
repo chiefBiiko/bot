@@ -30,7 +30,7 @@ pepper({ b: 44 }) // -> 'a:36, b:44, c:77'
 
 ## API
 
-### `const pepper = pepperFactory(func, paramNames, opts)`
+### `const pepper = pepperFactory(func, paramNames[, opts])`
 
 Make a *peppering* a function.
 
