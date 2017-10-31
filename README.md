@@ -1,5 +1,7 @@
 # pepper
 
+[![build status](http://img.shields.io/travis/chiefBiiko/pepper-factory.svg?style=flat)](http://travis-ci.org/chiefBiiko/pepper-factory)
+
 ***
 
 *Peppering* describes a technique that allows to assemble a function call incrementally, supplying arguments in any arbitrary order, by name. A *peppering function* returns `undefined` if there are remaining undefined parameters to the *peppered function*. A *peppering function* returns the evaluated *peppered function* once arguments to all required parameters of the *peppered function* have been supplied. It is closely related to *autocurrying* but revolves around a *peppering function* that identifies parameter-argument bindings by name rather than by order. To that end, arguments to the *peppering function* are supplied in the form of an arguments object.
@@ -15,12 +17,14 @@ This approach allows to supply a function's arguments incrementally and in an ar
 ```js
 const pepperFactory = require('pepper-factory')
 const stringify = (a, b, c) => `a:${a}, b:${b}, c:${c}`
-const pepper = pepperFactory(stringify, [ 'a', 'b', 'c' ])
+const pepper = pepperFactory(stringify, [ 'a', 'b', 'c' ], {})
 
 pepper({ c: 77 }) // -> undefined
 pepper({ a: 36 }) // -> undefined
 pepper({ b: 44 }) // -> 'a:36, b:44, c:77'
 ```
+
+*Peppering* behavior can be tweaked by setting some options.
 
 ***
 
@@ -28,7 +32,7 @@ pepper({ b: 44 }) // -> 'a:36, b:44, c:77'
 
 ### `const pepper = pepperFactory(func, paramNames, opts)`
 
-*Pepper* a function.
+Make a *peppering* a function.
 
 + `func` Function **required**
 + `paramNames` string[] **required**
@@ -53,6 +57,14 @@ pepper({ b: 44 }) // -> 'a:36, b:44, c:77'
 }
 ```
 **Return** Function
+
+### `pepper(Object)`
+
+*Pepper* towards a function evaluation by passing it an arguments object that has keys that equal parameter names.
+
+Anything but an object or non-matching object keys are just ignored.
+
+**Return** any
 
 ### `pepper.clear([string[]])`
 
