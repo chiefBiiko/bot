@@ -91,7 +91,7 @@ describe('fuzzy pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
   const fuzzyPepper = 
     pepperFactory(stringify, [ 'a', 'b' ], { levels: [ -1 ] })
-  it('should take values as indicated in searchDepth, fx anywhere', () => {
+  it('should take values as indicated in levels, fx anywhere', () => {
     should.equal(fuzzyPepper({ z: { y: { b: 5 } } }), undefined)
     fuzzyPepper({ z: { a: 6 } }).should.equal('a:6, b:5')
   })
@@ -101,7 +101,7 @@ describe('sharp pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
   const sharpPepper = 
     pepperFactory(stringify, [ 'a', 'b' ], { levels: [ 1, 2 ] })  
-  it('should only search at depths that are indicated', () => {
+  it('should only search at levels that are indicated', () => {
     should.equal(sharpPepper({ a: { y: { z: 7 } } }), undefined)
     should.equal(sharpPepper({ b: { x: 8 }, c: [] }), undefined)
     should.equal(sharpPepper({ a: 9 }), undefined)
