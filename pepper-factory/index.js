@@ -46,6 +46,10 @@ const pepperFactory =
         if (_args.map.hasOwnProperty(key))
           _args.map[key] = { value: undefined, ready: false }
       })
+    _input_countr = 
+      Object.keys(_args.map)
+        .map(key => _args.map[key])
+        .reduce((acc, cur) => acc += cur.ready ? 1 : 0, 0)
   }
   pepper.getArgMap = () => _args.map
   pepper.getConfig = () => { 
