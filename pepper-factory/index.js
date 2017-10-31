@@ -39,17 +39,15 @@ const pepperFactory =
     }
   }
   pepper.clear = keys => {
-    if (!keys || !Array.isArray(keys) || !keys.length)
+    if (!keys || !Array.isArray(keys) || !keys.length) {
       _args.map = _args.default()
-    else
+      _input_countr = 0
+    } else {
       keys.forEach(key => {
         if (_args.map.hasOwnProperty(key))
           _args.map[key] = { value: undefined, ready: false }
       })
-    _input_countr = 
-      Object.keys(_args.map)
-        .map(key => _args.map[key])
-        .reduce((acc, cur) => acc += cur.ready ? 1 : 0, 0)
+    }
   }
   pepper.getArgMap = () => _args.map
   pepper.getConfig = () => { 
