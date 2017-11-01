@@ -1,3 +1,8 @@
+//
+// TODO: 
+//   - recursion using a trampoline
+//   - change levels to aims and let em provide simple obj.key patterns
+//
 const pepperFactory = (func, paramNames, opts) => {
   const _args = { 
     map : {},
