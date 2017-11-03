@@ -10,8 +10,11 @@ const pepperFactory = (func, paramNames, opts) => {
     map: {},
     writes: 0,
     maybeStash(obj) {
-      ops.forEach(obj, (v, k) => {
-        if (paramNames.includes(k)) this.map[k] = { value: v, ready: true }
+      ops.forEach(obj, (val, key) => {
+        if (ops.some(this.map, (v, k) => k === key) && 
+            (opts.overwrite || !this.map[key].ready)) {
+          this.map[key] = { value: val, ready: true }
+        }
       })
     },
     default() {
@@ -47,14 +50,17 @@ const pepperFactory = (func, paramNames, opts) => {
   }
   const _getRgxMatchedObjects = (og, aims) => {
     if (!aims.length) return [ og ]
+    console.log('og', og)
     const mobs = []
     var parent = og
     var temp = null
     for (const aim of aims) {
+      console.log('aim', aim)
       for (let i = 0; i < aim.length; i++) {
-        temp = og[aim[i]]
-        console.log(temp)
+        temp = parent[aim[i]]
+        console.log('temp', temp)
         if (i === aim.length - 1 && _isObject(temp)) mobs.push(temp)
+        parent = temp
       }
       parent = og
       // const _hasRgxKey = ops.filter(parent, (v, k) => rgx.test(k))
@@ -74,7 +80,7 @@ const pepperFactory = (func, paramNames, opts) => {
   // pepper
   const pepper = argmap => {
     if (!_isObject(argmap)) return
-    if (opts.aims.includes([ '*' ])) {
+    if (opts.aims.map(String).some(path => path.includes('/.*/'))) {
       _walkAndMaybeStash(argmap)
     } else if (!opts.aims.length) {
       _args.maybeStash(argmap)
