@@ -1,9 +1,4 @@
-//
-// TODO:
-//   - recursion using a trampoline
-//   - change levels to aims and let em provide simple obj.key patterns
-//
-const ops = require('./../object-ops/index')
+const ops = require('./object-ops')
 
 const pepperFactory = (func, paramNames, opts) => {
   const _args = { // argument buffer cache
