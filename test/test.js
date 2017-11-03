@@ -1,6 +1,6 @@
 const should = require('chai').should()
 
-const pepperFactory = require('./../dev/pepper5')
+const pepperFactory = require('./../index')
 
 describe('pepperFactory', () => {
   const noop = () => {}
@@ -83,7 +83,7 @@ describe('pepper (getters)', () => {
     config.should.be.an('object')
     config.should.have.all.keys('func', 'paramNames', 'opts')
     config.opts
-      .should.have.all.keys('levels', 'overwrite', 'clearEvery', 'thisArg')
+      .should.have.all.keys('aims', 'overwrite', 'clearEvery', 'that')
   })
 })
 

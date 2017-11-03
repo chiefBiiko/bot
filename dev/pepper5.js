@@ -56,11 +56,17 @@ const pepperFactory = (func, paramNames, opts) => {
     var temp = null
     for (const aim of aims) {
       console.log('aim', aim)
-      for (let i = 0; i < aim.length; i++) {
-        temp = parent[aim[i]]
+      let i = 0
+      hitz = []
+      while (i < aim.length) {
+        if (!_isObject(parent)) break
+        hitz = Object.keys(parent).filter(k => aim[i].test(k))
+        if (!hitz.length) break
+        temp = parent[hitz[0]]
         console.log('temp', temp)
         if (i === aim.length - 1 && _isObject(temp)) mobs.push(temp)
         parent = temp
+        i++
       }
       parent = og
       // const _hasRgxKey = ops.filter(parent, (v, k) => rgx.test(k))
@@ -87,7 +93,8 @@ const pepperFactory = (func, paramNames, opts) => {
     } else {
       const mobs = _getRgxMatchedObjects(argmap, opts.aims)
       console.log('aims', opts.aims, 'mobs', mobs)
-      mobs.forEach(_walkAndMaybeStash)      
+      mobs.forEach(leaf => _args.maybeStash(leaf))
+      console.log('argzmap', _args.map)
     }
   //_walkAndMaybeStash(argmap, 0, argmap)
     if (ops.every(_args.map, v => v.ready)) {
@@ -108,7 +115,6 @@ const pepperFactory = (func, paramNames, opts) => {
   if (!_isObject(opts)) opts = {}
   if (!opts.that) opts.that = null
   if (!_isBoolean(opts.overwrite)) opts.overwrite = false
-  if (!_isNonEmptyNumberArray(opts.levels)) opts.levels = [ 0 ]
   opts.clearEvery = _isNumber(opts.clearEvery) ?
     Math.floor(opts.clearEvery) : -1
   opts.aims = _isStringArray(opts.aims) ? _globsToRgx(opts.aims) : []
