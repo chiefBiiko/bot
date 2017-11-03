@@ -90,7 +90,7 @@ describe('pepper (getters)', () => {
 describe('fuzzy pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
   const fuzzyPepper =
-    pepperFactory(stringify, [ 'a', 'b' ], { levels: [ -1 ] })
+    pepperFactory(stringify, [ 'a', 'b' ], { aims: [ '*' ] })
   it('should take values as indicated in levels, fx anywhere', () => {
     should.equal(fuzzyPepper({ z: { y: { b: 5 } } }), undefined)
     fuzzyPepper({ z: { a: 6 } }).should.equal('a:6, b:5')
@@ -100,12 +100,7 @@ describe('fuzzy pepper', () => {
 describe('sharp pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
   const sharpPepper =
-    pepperFactory(stringify, [ 'a', 'b' ], { levels: [ 1, 2 ] })
-  const sharprPepper =
-    pepperFactory(stringify, [ 'a', 'b', 'c' ], {
-      levels: [ 1 ],
-      restrict: 'b.*'
-    })
+    pepperFactory(stringify, [ 'a', 'b' ], { aims: [ 'y', 'x.y' ] })
   it('should only search at levels that are indicated', () => {
     should.equal(sharpPepper({ a: { y: { z: 7 } } }), undefined)
     should.equal(sharpPepper({ b: { x: 8 }, c: [] }), undefined)
@@ -113,15 +108,5 @@ describe('sharp pepper', () => {
     should.equal(sharpPepper({ b: 10, c: false }), undefined)
     should.equal(sharpPepper({ x: { y: { b: 11 } } }), undefined)
     sharpPepper({ y: { a: 12 } }).should.equal('a:12, b:11')
-  })
-  it('should only look into non-restricted objects', () => {
-    should.equal(sharprPepper({ a: 1, b: { a: 2 } }), undefined)
-    console.log(sharprPepper.getArgMap()) // make sure none are ready
-    should.equal(sharprPepper({ a: 3, c: { a: 4 } }), undefined)
-    console.log(sharprPepper.getArgMap())
-    should.equal(sharprPepper({ z: { b: 5 } }), undefined)
-    console.log(sharprPepper.getArgMap())
-    sharprPepper({ y: { c: 77 } }).should.equal('a:4, b:5, c:77')
-    console.log(sharprPepper.getArgMap())
   })
 })
