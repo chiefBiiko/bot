@@ -57,7 +57,7 @@ const ops = {
   hasKey(obj, key) {
     return obj.hasOwnProperty(key)
   },
-  hasValue(obj, val) {
+  hasVal(obj, val) {
     return this.some(obj, v => v === val)
   },
   keysOf(obj, val) {
