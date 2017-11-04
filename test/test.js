@@ -15,7 +15,6 @@ describe('pepper', () => {
   it('should autocurry', () => {
     should.equal(pepper({ a: 1 }), undefined)
     pepper({ b: 2 }).should.equal('a:1, b:2')
-    // eval and clear!!!
     pepper({ a: 11, b: 22 }).should.equal('a:11, b:22')
   })
   it('should numb on "wrong" input', () => {
@@ -31,11 +30,18 @@ describe('pepper', () => {
 describe('pepper (clear)', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
   const pepper = pepperFactory(stringify, [ 'a', 'b' ])
-  it('should clear its arguments after every evaluation', () => {
+  const shortPepper = pepperFactory(stringify, [ 'a', 'b' ], { clearEvery: 2 })
+  it('should clear its arguments after every evaluation by default', () => {
     should.equal(pepper({ a: 1 }), undefined)
     pepper({ b: 2 }).should.equal('a:1, b:2')
     should.equal(pepper({ b: 3 }), undefined)
     pepper({ a: 4 }).should.equal('a:4, b:3')
+  })
+  it('should allow setting a clear interval in opts.clearEvery', () => {
+   should.equal(shortPepper({ a: 44 }), undefined)
+   should.equal(shortPepper({ z: 99 }), undefined)
+   const argmap = shortPepper.getArgMap()
+   Object.keys(argmap).map(k => argmap[k]).every(v => v.ready.should.be.false)
   })
   it('should have a clear method, to be invoked manually', () => {
     pepper.clear.should.be.a('function')
@@ -91,7 +97,7 @@ describe('fuzzy pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
   const fuzzyPepper =
     pepperFactory(stringify, [ 'a', 'b' ], { aims: [ '*' ] })
-  it('should take values as indicated in levels, fx anywhere', () => {
+  it('should take values as indicated in opts.aims, fx anywhere', () => {
     should.equal(fuzzyPepper({ z: { y: { b: 5 } } }), undefined)
     fuzzyPepper({ z: { a: 6 } }).should.equal('a:6, b:5')
   })
@@ -101,7 +107,7 @@ describe('sharp pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
   const sharpPepper =
     pepperFactory(stringify, [ 'a', 'b' ], { aims: [ 'y', 'x.y' ] })
-  it('should only search at levels that are indicated', () => {
+  it('should only search at levels that are indicated in opts.aims', () => {
     should.equal(sharpPepper({ a: { y: { z: 7 } } }), undefined)
     should.equal(sharpPepper({ b: { x: 8 }, c: [] }), undefined)
     should.equal(sharpPepper({ a: 9 }), undefined)

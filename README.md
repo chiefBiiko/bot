@@ -12,7 +12,7 @@ This approach allows to supply a function's arguments incrementally and in an ar
 
 ## Usage
 
-*Pepper* a function by passing it to the `pepperFactory` alongside an array that lists its parameter names in the same order as they appear in the function's signature. 
+*Pepper* a function by passing it to the `pepperFactory` alongside an array that lists its parameter names in the same order as they appear in the function's signature, and an optional `opts` object. The returned *peppering function* grabs arguments for its underlying function only from plain old js objects, any other input is just ignored.
 
 ```js
 const pepperFactory = require('pepper-factory')
@@ -20,6 +20,11 @@ const stringify = (a, b, c) => `a:${a}, b:${b}, c:${c}`
 const pepper = pepperFactory(stringify, [ 'a', 'b', 'c' ], {})
 
 pepper({ c: 77 }) // -> undefined
+pepper(undefined) // -> undefined
+pepper(false)     // -> undefined
+pepper(0)         // -> undefined
+pepper(null)      // -> undefined
+pepper(() => {})  // -> undefined
 pepper({ a: 36 }) // -> undefined
 pepper({ b: 44 }) // -> 'a:36, b:44, c:77'
 ```
@@ -42,18 +47,22 @@ Make a *peppering* a function.
 
 ```js
 {
-  // opts.levels: number[]
-  // match obj.keys at these (nested) levels, [ -1 ] indicates anywhere
-  levels: [ 0 ],
+  // opts.aims: string[]
+  // match props to args only within the indicated objects
+  // [] -> top-level object only
+  // [ '*' ] -> objects at any branch and any level
+  // [ 'a.b*', 'b.*c', 'd' ] -> objects at the leaves of these branches, while
+  // the wildcard matches any number of any characters including none
+  aims: [],
   // opts.overwrite: boolean
   // overwrite previously stored argument matches?
   overwrite: false,
   // clearEvery: number
-  // clear stored argument matches after every N calls, -1 indicates never
-  clearEvery: -1,
-  // thisArg: any
+  // clear stored argument matches after every N calls, 0 indicates never
+  clearEvery: 0,
+  // that: any
   // this when evaluating func
-  thisArg: null
+  that: null
 }
 ```
 **Return** Function
