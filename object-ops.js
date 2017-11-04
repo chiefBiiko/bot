@@ -1,9 +1,9 @@
 const ops = {
   values(obj) {
-    return Object.keys(obj).map(function(k){ return this[k] }, obj)
+    return Object.keys(obj).map(function(k) { return this[k] }, obj)
   },
   props(obj) {
-    return Object.keys(obj).map(function(k){ return [ k, this[k] ] }, obj)
+    return Object.keys(obj).map(function(k) { return [ k, this[k] ] }, obj)
   },
   map(obj, func, that) { // func(val, key, obj)
     return this.props(obj).reduce(function(acc, cur) {
@@ -26,11 +26,12 @@ const ops = {
     })(0, init, this.props(obj), obj, func, that)
   },
   forEach(obj, func, that) { // func(val, key, obj)
-    this.props(obj)
-      .forEach(p => func.apply(that, p.reverse().concat(this)), obj)
+    this.props(obj).forEach(function(p) {
+      func.apply(that, p.reverse().concat(this)) 
+    }, obj)
   },
   every(obj, func, that) { // func(val, key, obj)
-    return this.props(obj).every(p => {
+    return this.props(obj).every(function(p) {
       return func.apply(that, p.reverse().concat(this))
     }, obj)
   },
