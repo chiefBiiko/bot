@@ -20,8 +20,8 @@ const ops = {
   reduce(obj, func, init, that) { // func(acc, cur, key, obj)
     return (function step(i, acc, props, obj, func, that) {
       if (i > props.length - 1) return acc
-      return step(i + 1, 
-                  func.call(that, acc, props[i][1], props[i][0], obj), 
+      return step(i + 1,
+                  func.call(that, acc, props[i][1], props[i][0], obj),
                   props, obj, func, that)
     })(0, init, this.props(obj), obj, func, that)
   },
@@ -30,19 +30,16 @@ const ops = {
       .forEach(p => func.apply(that, p.reverse().concat(this)), obj)
   },
   every(obj, func, that) { // func(val, key, obj)
-    return this.props(obj).reduce(function(acc, cur) {
-      if (!func.apply(that, cur.reverse().concat(this))) acc = false
-      return acc
-    }, true, obj)
+    return this.props(obj).every(p => {
+      return func.apply(that, p.reverse().concat(this))
+    }, obj)
   },
   some(obj, func, that) { // func(val, key, obj)
     const props = this.props(obj)
-    var rtn = false
     for (const p of props) {
-      rtn = !!func.apply(that, p.reverse().concat(obj))
-      if (rtn) break
+      if (func.apply(that, p.reverse().concat(obj))) return true
     }
-    return rtn
+    return false
   },
   randomProp(obj) {
     const props = this.props(obj)
@@ -54,11 +51,14 @@ const ops = {
   randomVal(obj) {
     return this.randomProp(obj)[1]
   },
-  hasValue(obj, val) {
-    return this.some(obj, v => v === val)
-  },
   hasProp(obj, key, val) {
     return this.some(obj, (v, k) => k === key && v === val)
+  },
+  hasKey(obj, key) {
+    return obj.hasOwnProperty(key)
+  },
+  hasValue(obj, val) {
+    return this.some(obj, v => v === val)
   },
   keysOf(obj, val) {
     return Object.keys(this.filter(obj, v => v === val))
