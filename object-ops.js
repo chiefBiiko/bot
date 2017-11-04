@@ -13,9 +13,9 @@ const ops = {
   },
   filter(obj, func, that) { // func(val, key, obj)
     return this.props(obj).reduce(function(acc, cur) {
-      if (func.apply(that, cur.reverse().concat(this))) acc[cur[1]] = cur[0]
+      if (!func.apply(that, cur.reverse().concat(this))) delete acc[cur[1]]
       return acc
-    }, {}, obj)
+    }, obj, obj)
   },
   reduce(obj, func, init, that) { // func(acc, cur, key, obj)
     return (function step(i, acc, props, obj, func, that) {
