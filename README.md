@@ -17,7 +17,7 @@ This approach allows to supply a function's arguments incrementally and in an ar
 ```js
 const pepperFactory = require('pepper-factory')
 const stringify = (a, b, c) => `a:${a}, b:${b}, c:${c}`
-const pepper = pepperFactory(stringify, [ 'a', 'b', 'c' ], {})
+const pepper = pepperFactory(stringify, [ 'a', 'b', 'c' ], {/*...*/})
 
 pepper({ c: 77 }) // -> undefined
 pepper(undefined) // -> undefined
@@ -29,7 +29,7 @@ pepper({ a: 36 }) // -> undefined
 pepper({ b: 44 }) // -> 'a:36, b:44, c:77'
 ```
 
-*Peppering* behavior can be tweaked by setting some options.
+**_Peppering_** behavior can be tweaked by setting some options.
 
 ***
 
@@ -37,7 +37,7 @@ pepper({ b: 44 }) // -> 'a:36, b:44, c:77'
 
 ### `const pepper = pepperFactory(func, paramNames[, opts])`
 
-Make a *peppering* a function.
+Make a **_peppering_** function.
 
 + `func` *Function* The function to be **_peppered_** **required**
 + `paramNames` *string[]* An array of the parameter names for `func` (in the same order as in its signature) **required**
@@ -49,11 +49,9 @@ Make a *peppering* a function.
 {
   // opts.aims: string[]
   // match props to args only within the indicated objects
-  /*
-    []                      -> top-level object only
-    [ '*' ]                 -> objects at any branch and any level
-    [ 'a.b*', 'b.*c', 'd' ] -> objects at the leaves of these branches, with a wildcard matching any number of characters
-  */
+  // []                      -> top-level object only
+  // [ '*' ]                 -> objects at any branch and any level
+  // [ 'a.b*', 'b.*c', 'd' ] -> objects at the leaves of these branches, with a * matching any number of chars
   aims: [],
   // opts.overwrite: boolean
   // overwrite previously stored argument matches?
