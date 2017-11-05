@@ -40,8 +40,8 @@ describe('pepper (clear)', () => {
   it('should allow setting a clear interval in opts.clearEvery', () => {
    should.equal(shortPepper({ a: 44 }), undefined)
    should.equal(shortPepper({ z: 99 }), undefined)
-   const argmap = shortPepper.getArgMap()
-   Object.keys(argmap).map(k => argmap[k]).every(v => v.ready.should.be.false)
+   const stash = shortPepper.getStash()
+   Object.keys(stash).map(k => stash[k]).every(v => v.ready.should.be.false)
   })
   it('should have a clear method, to be invoked manually', () => {
     pepper.clear.should.be.a('function')
@@ -77,12 +77,12 @@ describe('pepper (overwrite)', () => {
 describe('pepper (getters)', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
   const pepper = pepperFactory(stringify, [ 'a', 'b' ])
-  it('should have getters getArgMap and getConfig', () => {
-    pepper.getArgMap.should.be.a('function')
+  it('should have getters getStash and getConfig', () => {
+    pepper.getStash.should.be.a('function')
     pepper.getConfig.should.be.a('function')
   })
-  it('should have getArgMap that returns an object', () => {
-    pepper.getArgMap().should.be.an('object')
+  it('should have getStash that returns an object', () => {
+    pepper.getStash().should.be.an('object')
   })
   it('should have getConfig that returns an object with keys...', () => {
     const config = pepper.getConfig()
