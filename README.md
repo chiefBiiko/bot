@@ -4,7 +4,7 @@
 
 ***
 
-*Peppering* describes a technique that allows to assemble a function call incrementally, supplying arguments in any arbitrary order, by name. A *peppering function* returns `undefined` if there are remaining undefined parameters to the *peppered function*. A *peppering function* returns the evaluated *peppered function* once arguments to all required parameters of the *peppered function* have been supplied. It is closely related to *autocurrying* but revolves around a *peppering function* that identifies parameter-argument bindings by name rather than by order. To that end, arguments to the *peppering function* are supplied in the form of an arguments object.
+**_Peppering_** describes a technique that allows to assemble a function call incrementally, supplying arguments in any arbitrary order, by name. A **_peppering function_** returns `undefined` if there are remaining undefined parameters to the **_peppered function_**. A **_peppering function_** returns the evaluated **_peppered function_** once arguments to all required parameters of the **_peppered function_** have been supplied. It is closely related to [auto currying](https://github.com/hemanth/functional-programming-jargon#auto-currying) but revolves around a **_peppering function_** that identifies parameter-argument bindings by name rather than by order. To that end, arguments to the **_peppering function_** are supplied in the form of an arguments object.
 
 This approach allows to supply a function's arguments incrementally and in an arbitrary order, not necessarily the parameter order of the function's signature. Useful for dynamically building function calls, fx from incremental user input.
 
@@ -12,7 +12,7 @@ This approach allows to supply a function's arguments incrementally and in an ar
 
 ## Usage
 
-*Pepper* a function by passing it to the `pepperFactory` alongside an array that lists its parameter names in the same order as they appear in the function's signature, and an optional `opts` object. The returned *peppering function* grabs arguments for its underlying function only from plain old js objects, any other input is just ignored.
+**_Pepper_** a function by passing it to the `pepperFactory` alongside an array that lists its parameter names in the same order as they appear in the function's signature, and an optional `opts` object. The returned **_peppering function_** grabs arguments for its underlying function only from plain old js objects, any other input is just ignored.
 
 ```js
 const pepperFactory = require('pepper-factory')
@@ -39,9 +39,9 @@ pepper({ b: 44 }) // -> 'a:36, b:44, c:77'
 
 Make a *peppering* a function.
 
-+ `func` Function **required**
-+ `paramNames` string[] **required**
-+ `opts` Object **optional**
++ `func` *Function* The function to be **_peppered_** **required**
++ `paramNames` *string[]* An array of the parameter names for `func` (in the same order as in its signature) **required**
++ `opts` *Object* Further options **optional**
 
 `opts` defaults to:
 
@@ -49,10 +49,11 @@ Make a *peppering* a function.
 {
   // opts.aims: string[]
   // match props to args only within the indicated objects
-  // [] -> top-level object only
-  // [ '*' ] -> objects at any branch and any level
-  // [ 'a.b*', 'b.*c', 'd' ] -> objects at the leaves of these branches, while
-  // the wildcard matches any number of any characters including none
+  /*
+    []                      -> top-level object only
+    [ '*' ]                 -> objects at any branch and any level
+    [ 'a.b*', 'b.*c', 'd' ] -> objects at the leaves of these branches, with a wildcard matching any number of characters
+  */
   aims: [],
   // opts.overwrite: boolean
   // overwrite previously stored argument matches?
@@ -83,7 +84,7 @@ If called with an array of keys to clear, only the indicated argument values are
 
 **Return** undefined
 
-### `pepper.getArgMap()`
+### `pepper.getStash()`
 
 Get the internal arguments object.
 
@@ -99,4 +100,4 @@ Get an configurations object that includes all defined and defaulted arguments o
 
 ## License
 
-MIT
+[MIT](./license.md)

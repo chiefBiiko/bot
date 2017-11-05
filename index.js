@@ -1,4 +1,4 @@
-const ops = require('./object-ops')
+const ops = require('pojo-ops')
 const be = require('./be')
 const is = {
   boolean: be.boolean,

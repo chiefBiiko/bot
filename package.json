@@ -3,25 +3,31 @@
   "version": "0.0.1",
   "description": "Autocurrying with parameter names",
   "main": "index.js",
-  "keywords": [],
+  "keywords": [
+    "autocurrying",
+    "functional programming"
+  ],
   "author": "Noah Anabiik Schwarz",
   "license": "MIT",
-  "engines" : {
-    "node" : ">=6.00"
+  "engines": {
+    "node": ">=6.00"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/chiefBiiko/pepper-factory.git"
+    "url": "https://github.com/chiefbiiko/pepper-factory.git"
   },
   "bugs": {
-    "url": "https://github.com/chiefBiiko/pepper-factory/issues"
+    "url": "https://github.com/chiefbiiko/pepper-factory/issues"
   },
-  "homepage": "https://github.com/chiefBiiko/pepper-factory",
+  "homepage": "https://github.com/chiefbiiko/pepper-factory",
   "devDependencies": {
     "chai": "^4.1.2",
     "mocha": "^4.0.1"
+  },
+  "dependencies": {
+    "pojo-ops": "0.0.1"
   }
 }
