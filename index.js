@@ -40,20 +40,20 @@ module.exports = function pepperFactory(func, paramNames, opts) {
     },
     maybeStash(obj) {
       ops.forEach(obj, (val, key) => {
-        if (ops.hasKey(this.stash, key) &&
-            (opts.overwrite || !this.stash[key].ready))
-          this.stash[key] = { value: val, ready: true }
+        if (ops.hasKey(trap.stash, key) &&
+            (opts.overwrite || !trap.stash[key].ready))
+          trap.stash[key] = { value: val, ready: true }
       })
     },
     zero() {
-      this.calls = 0
-      this.stash = paramNames.reduce((acc, cur) => {
+      trap.calls = 0
+      trap.stash = paramNames.reduce((acc, cur) => {
         acc[cur] = { value: undefined, ready: false }
         return acc
       }, {})
     },
     clear(keys) {
-      this.stash = ops.map(this.stash, (v, k) => {
+      trap.stash = ops.map(trap.stash, (v, k) => {
         return keys.includes(k) ? { value: undefined, ready: false } : v
       })
     }
@@ -67,9 +67,9 @@ module.exports = function pepperFactory(func, paramNames, opts) {
         trap.maybeStash(input)
       } else {
         const mobs = trap.getRgxMatchedObjects(input, opts.aims)
-        mobs.forEach(trap.maybeStash.bind(trap))
+        mobs.forEach(trap.maybeStash)
       }
-      if (ops.every(trap.stash, v => v.ready)) {
+      if (ops.every(trap.stash, a => a.ready)) {
         const temp = trap.stash
         trap.zero()
         return func.apply(opts.that, ops.values(temp).map(a => a.value))
