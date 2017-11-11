@@ -1,5 +1,5 @@
 const ops = require('pojo-ops')
-const be = require('./be')
+const be = require('be-of-type')
 const is = {
   boolean: be.boolean,
   uInt: x => be.number(x) && x >= 0 && x % 1 === 0,
@@ -7,20 +7,23 @@ const is = {
   nonEmptyStringArray: x => be.array(x) && x.length && x.every(be.string)
 }
 
-module.exports = function pepperFactory(func, paramNames, opts) {
+module.exports = function pepperFactory (func, paramNames, opts) {
   const trap = { // internal
     stash: {},
     calls: 0,
-    globsToRgx(globs) {
+    globsToRgx (globs) {
       return globs.map(v => v.replace('*', '.*').split(/\.(?!\*)/))
     },
-    getRgxMatchedObjects(og, aims) {
+    getRgxMatchedObjects (og, aims) {
       if (!aims.length) return [ og ]
       const mobs = []
       for (const aim of aims) {
-        let parent = og, i = 0, hitz = [], temp = null
+        let parent = og
+        let i = 0
+        let hitz = []
+        let temp = null
         while (i < aim.length) {
-          hitz = Object.keys(parent).filter(k => RegExp(aim[i]).test(k))
+          hitz = ops.keys(parent).filter(k => RegExp(aim[i]).test(k))
           if (!hitz.length) break
           temp = parent[hitz[0]]
           if (!is.plainObject(temp)) break
@@ -31,35 +34,36 @@ module.exports = function pepperFactory(func, paramNames, opts) {
       }
       return mobs
     },
-    walkAndMaybeStash(obj) { // depth-first walker
+    walkAndMaybeStash (obj) { // depth-first walker
       ops.forEach(ops.map(ops.filter(obj, is.plainObject), o => {
         trap.maybeStash(o)
         trap.walkAndMaybeStash(o)
         return o
       }), trap.walkAndMaybeStash)
     },
-    maybeStash(obj) {
+    maybeStash (obj) {
       ops.forEach(obj, (val, key) => {
         if (ops.hasKey(trap.stash, key) &&
-            (opts.overwrite || !trap.stash[key].ready))
+            (opts.overwrite || !trap.stash[key].ready)) {
           trap.stash[key] = { value: val, ready: true }
+        }
       })
     },
-    zero() {
+    zero () {
       trap.calls = 0
       trap.stash = paramNames.reduce((acc, cur) => {
         acc[cur] = { value: undefined, ready: false }
         return acc
       }, {})
     },
-    clear(keys) {
+    clear (keys) {
       trap.stash = ops.map(trap.stash, (v, k) => {
         return keys.includes(k) ? { value: undefined, ready: false } : v
       })
     }
   }
   // factory assembly
-  function pepper(input) {
+  function pepper (input) {
     if (is.plainObject(input)) {
       if (opts.aims.some(path => path.includes('.*'))) {
         trap.walkAndMaybeStash(input)

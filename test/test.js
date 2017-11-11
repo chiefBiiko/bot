@@ -107,7 +107,7 @@ describe('sharp pepper', () => {
   const stringify = (a, b) => `a:${a}, b:${b}`
   const sharpPepper =
     pepperFactory(stringify, [ 'a', 'b' ], { aims: [ 'y', 'x.y' ] })
-  it('should only search at levels that are indicated in opts.aims', () => {
+  it('should only search at places that are indicated in opts.aims', () => {
     should.equal(sharpPepper({ a: { y: { z: 7 } } }), undefined)
     should.equal(sharpPepper({ b: { x: 8 }, c: [] }), undefined)
     should.equal(sharpPepper({ a: 9 }), undefined)

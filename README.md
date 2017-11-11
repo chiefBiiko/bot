@@ -1,6 +1,6 @@
 # pepper-factory
 
-[![build status](http://img.shields.io/travis/chiefbiiko/pepper-factory.svg?style=flat)](http://travis-ci.org/chiefbiiko/pepper-factory) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/chiefbiiko/pepper-factory?branch=master&svg=true)](https://ci.appveyor.com/project/chiefbiiko/pepper-factory)
+[![build status](http://img.shields.io/travis/chiefbiiko/pepper-factory.svg?style=flat)](http://travis-ci.org/chiefbiiko/pepper-factory) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/chiefbiiko/pepper-factory?branch=master&svg=true)](https://ci.appveyor.com/project/chiefbiiko/pepper-factory) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ***
 
